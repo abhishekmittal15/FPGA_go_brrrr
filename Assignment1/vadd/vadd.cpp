@@ -7,7 +7,7 @@
 #include<cstring>
 #include<unistd.h>
 
-#include "CL/cl_ext_xilinx.hpp"
+#include "CL/cl_ext_xilinx.h"
 #include "xcl2.hpp"
 
 using std::cerr;
@@ -15,7 +15,7 @@ using std::cin;
 using std::cout;
 using std::endl;
 
-void vectors_init(int *buffer_a,int *buffer_b, int *sw_results,int *hw-results,unsigned int num_elements){
+void vectors_init(int *buffer_a,int *buffer_b, int *sw_results,int *hw_results,unsigned int num_elements){
     for (size_t i = 0; i < num_elements;i++){
         buffer_a[i] = std::rand() * ((std::rand() % 2) ? 1 : -1);
         buffer_b[i] = std::rand() * ((std::rand() % 2) ? 1 : -1);
@@ -44,7 +44,7 @@ bool verify(int *hw_results,int *sw_results,unsigned int num_elements){
 int main(int argc,char **argv){
     if(argc<2 || argc>4){
         cout << "Usage: " << argv[0] << " <XCLBIN File> <#elements(optional)> <debug(optional)>" << endl;
-        return EXIT_FAILURE
+        return EXIT_FAILURE;
     }
     auto binaryFile = argv[1];
     unsigned int num_elements = 4096;
@@ -54,7 +54,7 @@ int main(int argc,char **argv){
         user_size = true;
         unsigned int val;
         try{
-            val = std::stoi(rgv[2]);
+            val = std::stoi(argv[2]);
         }
         catch(const std::invalid_argument val){
             cerr << "Invalid Argument in position 2(" << argv[2] << ") program expects an integer as number of elements" << endl;
@@ -78,13 +78,17 @@ int main(int argc,char **argv){
 
     if(user_size==false){
         if(xcl::is_hw_emulation())
-            num_elements=4096
+            num_elements = 4096;
         else if(xcl::is_emulation())
             num_elements=4096*8;
         else
             num_elements = 4096 * 4096;
     }
-
+    cl::Device device;
+    cl::CommandQueue q;
+    cl::Context context;
+    cl::Program program;
+    cl::Kernel krnl_vadd;
     cl_int err;
 
     auto devices = xcl::get_xil_devices();
@@ -96,10 +100,8 @@ int main(int argc,char **argv){
     bool valid_device = false;
 
     for (unsigned int i = 0; i < devices.size();i++){
-        cl::Device device = devices[i];
-        cl::Context context;
+        device = devices[i];
         OCL_CHECK(err,context=cl::Context(device,NULL,NULL,&err));
-        cl::CommandQueue q;
         OCL_CHECK(err,q=cl::CommandQueue(context,device,CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE));
         cout << "Trying to program device[" << i << "] : " << device.getInfo<CL_DEVICE_NAME>() << endl;
         cl::Program program(context, {device}, bins, NULL < &err);
@@ -107,7 +109,6 @@ int main(int argc,char **argv){
             cout << "Failed to program device[" << i << "]" << endl;
         }
         else{
-            cl::Kernel krnl_vadd;
             cout << "Device[" << i << "] has been successfuly programmed" << endl;
             OCL_CHECK(err, krnl_vadd = cl::Kernel(program, "krnl_vadd", &err));
             valid_device = true;
@@ -133,7 +134,7 @@ int main(int argc,char **argv){
     unsigned int size_bytes = num_elements * sizeof(int);
 
     cout << "Running Application on host : " << endl;
-    vectors_add_sw(buffer_a.data(),buffer_b.data(),sw_results.data());
+    vectors_add_sw(buffer_a.data(),buffer_b.data(),sw_results.data(),num_elements);
     cout << "Application has finished executing on host" << endl;
 
     cout << "Running the application on the FPGA chip" << endl;
@@ -161,9 +162,9 @@ int main(int argc,char **argv){
 
     if(debug){
         for (unsigned int i = 0; i < num_elements;i++){
-            cout << "Idx [" << std::setw(6) << i << "]" << std::setw(14) << buffer_a[i] << " + " < ;
+            cout << "Idx [" << std::setw(6) << i << "]" << std::setw(14) << buffer_a[i] << " + " ;
             cout << std::setw(14) << buffer_b[i] << "\t sw_result=" << std::setw(14) << sw_results[i];
-            cout<<"\t hw_result="<<sttd::setw(14)<<hw_results[i];
+            cout<<"\t hw_result="<<std::setw(14)<<hw_results[i];
             cout << "\t equal" << ((hw_results[i] == sw_results[i]) ? "True" : "False") << endl;
         }
     }
