@@ -34,5 +34,10 @@ void krnl_vadd(
                 out[i + j] = in1[i + j] + v1_buffer[j];
             }
     }
+
+    // Burst Reading both vectors and then adding them up and then burst writing
+    for (unsigned int i = 0; i < size;i++){
+        out[i] = in1[i] + in2[i];
+    }
 }
 }
