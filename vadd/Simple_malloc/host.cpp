@@ -39,18 +39,18 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BUFSIZE (1024 * 1024 * 6)
 
 void init(int *a, int *b, int *c,int *d,unsigned int size){
-    for (uint32_t i = 0; i < size;i++){
-        a[i] = std::rand() / 100;
-        b[i] = std::rand() / 100;
+    for (unsigned int i = 0; i < size;i++){
+        a[i] = (int)(std::rand() / 100);
+        b[i] = (int)(std::rand() / 100);
         c[i] = 0;
         d[i] = 0;
     }
 }
 
-void vadd_sw(int *a, int *b, int *c, int size)
+void vadd_sw(int *a, int *b, int *d,unsigned int size)
 {
-    for (int i = 0; i < size; i++) {
-        c[i] = a[i] + b[i];
+    for (unsigned int i = 0; i < size; i++) {
+        d[i] = a[i] + b[i];
     }
 }
 
@@ -120,6 +120,7 @@ int main(int argc, char *argv[])
                            b,
                            NULL);
     cl::Buffer c_from_device(xocl.get_context(),
+    
                              static_cast<cl_mem_flags>(CL_MEM_WRITE_ONLY |
                                                        CL_MEM_USE_HOST_PTR),
                              num_elements * sizeof(int),
@@ -153,7 +154,7 @@ int main(int argc, char *argv[])
 
     // Verify the results
     bool verified = true;
-    for (int i = 0; i < BUFSIZE; i++) {
+    for (int i = 0; i < num_elements; i++) {
         if (c[i] != d[i]) {
             verified = false;
             std::cout << "ERROR: software and hardware vadd do not match: "
@@ -161,6 +162,8 @@ int main(int argc, char *argv[])
             break;
         }
     }
+
+    std::cout << "Original Kernel" << std::endl;
 
     if (verified) {
         std::cout
