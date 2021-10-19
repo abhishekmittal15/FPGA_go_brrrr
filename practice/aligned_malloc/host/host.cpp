@@ -20,15 +20,15 @@ void host_side_comp(float *a,float *b,float *sw,unsigned int num_elements){
         sw[i] = a[i] * b[i];
 }
 
-int main(int agrc,char **argv){
+int main(int argc,char **argv){
     if(argc!=3){
         cout << "Insufficient Arguments" << endl;
         return EXIT_FAILURE;
     }
 
-    std::string binaryFile = argv[1];
-    unsigned int num_elements = std::stoi(argv[2]);
-    FILE *fileBuf = xcl::read_binary_file(binaryFile);
+    unsigned int num_elements = std::stoi(argv[1]);
+    char *binaryFile = argv[2];
+    auto fileBuf = xcl::read_binary_file(binaryFile);
     cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
 
     cl::Device device;
@@ -46,7 +46,7 @@ int main(int agrc,char **argv){
         OCL_CHECK(err, q = cl::CommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &err));
         cout << "Trying to program the device[" << i << "] : " << device.getInfo<CL_DEVICE_NAME>() << endl;
         program=cl::Program(context, {device}, bins,NULL, &err);
-        if(err=CL_SUCCESS){
+        if(err==CL_SUCCESS){
             cout << "Successfully programmed the device [" << i << "]" << endl;
             OCL_CHECK(err, kernel = cl::Kernel(program,"krnl_vmult",&err));
             valid_device = true;
@@ -69,7 +69,7 @@ int main(int agrc,char **argv){
     // Step 3: Create the opencl Buffers using the host pointers
     OCL_CHECK(err,cl::Buffer a_buf(context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, size_bytes, a,  &err));
     OCL_CHECK(err,cl::Buffer b_buf(context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, size_bytes, b,  &err));
-    OCL_CHECK(err,cl::Buffer out_buf(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, size_bytes, hw,  &err));
+    OCL_CHECK(err,cl::Buffer hw_buf(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, size_bytes, hw,  &err));
 
     // Step 4: Initialise the allocated memory
     init(a, b, sw, hw,num_elements);
@@ -93,7 +93,7 @@ int main(int agrc,char **argv){
     OCL_CHECK(err, q.enqueueTask(kernel));
 
     // Step 7c: Thirdly, migrate the results from the device's global memory to the host side
-    OCL_CHECK(err, q.enqueueMigrateMemObjects(hw_buf, CL_MEM_HOST));
+    OCL_CHECK(err, q.enqueueMigrateMemObjects({hw_buf}, CL_MIGRATE_MEM_OBJECT_HOST));
 
     // Step 8: Compare the software and hardware results
 

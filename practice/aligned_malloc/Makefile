@@ -4,7 +4,7 @@ KERNEL_NAME := krnl_vmult
 device := $(AWS_PLATFORM)
 host_files := ./host/host.cpp ./host/xcl2.cpp
 kernel_file := ./kernel/kernel.cpp
-includes_folder := ./includes
+include_folder := ./include
 TEMP_DIR := temp_dir
 build_folder := ./build
 PACKAGE_OUT := ./package.$(TARGET)
@@ -26,7 +26,7 @@ opencl_LDFLAGS=-L$(OPENCL_LIB) -lOpenCL -pthread
 ###### Setting Host variables ######
 cxx := g++
 cxx_flags := $(opencl_CXXFLAGS) -Wall -O3 -g -std=c++11 -fmessage-length=0
-cxx_flags += -I$(includes_folder)
+cxx_flags += -I$(include_folder)
 ld_flags := $(opencl_LDFLAGS) 
 ld_flags += -lrt -lstdc++ -lxilinxopencl -lpthread
 ####################################
@@ -39,7 +39,7 @@ vpp_ldflags :=
 ####################################
 
 ###### Build the host ##############
-host_exe: $(host_file) 
+host_exe: $(host_files) 
 	$(cxx) -o $@ $^ $(cxx_flags) $(ld_flags)
 
 ####################################
@@ -47,7 +47,7 @@ host_exe: $(host_file)
 ###### Build the Kernel objects ############
 kernel.xo: $(kernel_file)
 	mkdir -p $(TEMP_DIR)
-	$(vpp) $(vpp_flags) -o $@ $^ -c -k $(KERNEL_NAME) -I$(includes_folder) 
+	$(vpp) $(vpp_flags) -o $@ $^ -c -k $(KERNEL_NAME) -I$(include_folder) 
 
 ####################################
 
@@ -126,5 +126,5 @@ endif
 # 	-$(RMDIR) _x* *xclbin.run_summary qemu-memory-_* emulation _vimage pl* start_simulation.sh *.xclbin
 
 clean:
-	$(RMDIR) .run temp_dir _x 
-	$(RMDIR) emconfig.json host_exe *.xo *summary *txt *log 
+	$(RMDIR) .run temp_dir _x .Xil $(PACKAGE_OUT)
+	$(RM) emconfig.json host_exe *.xo *summary *txt *log build/*

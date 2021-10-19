@@ -34,7 +34,7 @@ extern "C"{
                     v3_local[i] = v1_local[j] * v2_local[j];
                 }
 
-            read1:
+            write:
                 for (unsigned int j = 0; j < chunk_size; j++)
                 {
                     out[i+j]=v3_local[j];
