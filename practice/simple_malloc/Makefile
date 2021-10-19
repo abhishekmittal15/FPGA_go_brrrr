@@ -2,11 +2,12 @@ TARGET := sw_emu
 NUM_ELEMENTS := 4096
 KERNEL_NAME := krnl_vadd
 device := $(AWS_PLATFORM)
-host_file := ./host/host.cpp
+host_files := ./host/host.cpp ./host/xcl2.cpp
 kernel_file := ./kernel/kernel.cpp
 includes_folder := ./includes
 TEMP_DIR := temp_dir
 build_folder := ./build
+PACKAGE_OUT := ./package.$(TARGET)
 RM = rm -f
 RMDIR = rm -rf
 
@@ -25,20 +26,20 @@ opencl_LDFLAGS=-L$(OPENCL_LIB) -lOpenCL -pthread
 ###### Setting Host variables ######
 cxx := g++
 cxx_flags := $(opencl_CXXFLAGS) -Wall -O3 -g -std=c++11 -fmessage-length=0
-cxx_flags += -I$(includes_folder) -I 
+cxx_flags += -I$(includes_folder)
 ld_flags := $(opencl_LDFLAGS) 
 ld_flags += -lrt -lstdc++ -lxilinxopencl -lpthread
 ####################################
 
 ###### Setting Kernel variables ######
 vpp := v++
-vpp_flags := -target $(TARGET) --platform $(device) --save-temps -g 
+vpp_flags := --target $(TARGET) --platform $(device) --save-temps -g 
 vpp_flags += --temp_dir $(TEMP_DIR) 
 vpp_ldflags :=
 ####################################
 
 ###### Build the host ##############
-host: $(host_file) 
+host_exe: $(host_file) 
 	$(cxx) -o $@ $^ $(cxx_flags) $(ld_flags)
 
 ####################################
@@ -46,7 +47,7 @@ host: $(host_file)
 ###### Build the Kernel objects ############
 kernel.xo: $(kernel_file)
 	mkdir -p $(TEMP_DIR)
-	$(vpp) -o $@ $^ -c -k $(KERNEL_NAME) -I$(includes_folder) 
+	$(vpp) $(vpp_flags) -o $@ $^ -c -k $(KERNEL_NAME) -I$(includes_folder) 
 
 ####################################
 
@@ -63,11 +64,14 @@ emconfig:
 	emconfigutil --platform $(device) --od $(TEMP_DIR)
 
 ########## Run the Kernel ################
-run: host kernel.xo kernel.xclbin emconfig
+run: host_exe kernel.xo kernel.xclbin emconfig
 ifneq ($(TARGET),hw)
 	cp -rf $(TEMP_DIR)/emconfig.json .
-	XCL_EMULATION_MODE=$(TARGET)
-	./host $(build_folder)/kernel.xclbin $(num_elements)
+	export XCL_EMULATION_MODE=$(TARGET)
+	@echo 
+	@echo 
+	@echo RUNTIME RESULTS
+	./host_exe $(NUM_ELEMENTS) $(build_folder)/kernel.xclbin 
 else
 	./host 
 endif
@@ -113,7 +117,7 @@ endif
 
 clean:
 	-$(RMDIR) $(EXECUTABLE) $(XCLBIN)/{*sw_emu*,*hw_emu*} 
-	-$(RMDIR) profile_* TempConfig system_estimate.xtxt *.rpt *.csv 
+	-$(RMDIR) profile_* TempConfig system_estimate.xtxt *.rpt *.csv *summary *xo $(TEMP_DIR)
 	-$(RMDIR) src/*.ll *v++* .Xil emconfig.json dltmp* xmltmp* *.log *.jou *.wcfg *.wdb
 
 cleanall: clean

@@ -1,0 +1,2 @@
+performing high-level synthesis for kernel: krnl_vadd
+Log file: /home/ec2-user/FPGA_go_brrrr/practice/simple_malloc/temp_dir/kernel/krnl_vadd/vitis_hls.log

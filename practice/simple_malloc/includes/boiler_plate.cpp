@@ -15,21 +15,23 @@ if(argc!=3){
     cl::Kernel kernel;
     cl::Program program;
     cl_int err;
+    bool valid_device = true;
 
-    std::vector<cl::Devices> devices = xcl::get_xil_devices();
-    for (int i = 0; i < devices;i++){
+    std::vector<cl::Device> devices = xcl::get_xil_devices();
+    for (unsigned int i = 0; i < devices.size();i++){
         device = devices[i];
         OCL_CHECK(err, context = cl::Context(device, NULL, NULL, NULL, &err));
-        OCL_CHECK(err, q = cl::CommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_ENABLE, &err));
-        cout << "Trying to program the device[" << i << "] : " << cl::get_device_info<CL_DEVICE_NAME>() << endl;
-        cl::Program program(context,{device},bins,NULL,&err);
+        OCL_CHECK(err, q = cl::CommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &err));
+        cout << "Trying to program the device[" << i << "] : " << device.getInfo<CL_DEVICE_NAME>() << endl;
+        cl::Program program(context,{device},bin,NULL,&err);
         if(err==CL_SUCCESS){
+            cout << "DEVICE [" << i << "] programmed Sucessfully" << endl;
             OCL_CHECK(err, kernel = cl::Kernel(program, kernel_name, &err));
             valid_device = true;
             break;
         }
         else{
-            cout << "Failed to program the device[" << i << "] : " << cl::get_device_info<CL_DEVICE_NAME>() << endl;
+            cout << "Failed to program the device[" << i << "] : " << device.getInfo<CL_DEVICE_NAME>() << endl;
         }
     }
     if(valid_device==false){

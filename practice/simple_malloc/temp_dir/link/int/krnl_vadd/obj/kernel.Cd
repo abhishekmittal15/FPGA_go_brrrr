@@ -1,0 +1,5 @@
+obj/kernel.o: \
+ /home/ec2-user/FPGA_go_brrrr/practice/simple_malloc/temp_dir/link/int/xo/krnl_vadd/krnl_vadd/cpu_sources/kernel.cpp \
+ /usr/include/stdc-predef.h
+
+/usr/include/stdc-predef.h:
