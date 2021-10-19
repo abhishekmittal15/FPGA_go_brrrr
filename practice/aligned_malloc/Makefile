@@ -127,4 +127,7 @@ endif
 
 clean:
 	$(RMDIR) .run temp_dir _x .Xil $(PACKAGE_OUT)
-	$(RM) emconfig.json host_exe *.xo *summary *txt *log build/*
+	$(RM) emconfig.json host_exe *.xo *summary *txt *log build/*.info build/*summary
+
+cleanall:
+	$(RM) build/*

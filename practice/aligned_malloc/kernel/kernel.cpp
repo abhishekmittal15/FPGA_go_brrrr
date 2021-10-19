@@ -2,7 +2,7 @@
 
 extern "C"{
     void krnl_vmult(
-        float* a,
+        float *a,
         float *b,
         float *out,
         unsigned int num_elements
@@ -19,19 +19,19 @@ extern "C"{
             
             read1:
                 for (unsigned int j = 0; j < chunk_size;j++){
-                    v1_local[i] = a[i + j];
+                    v1_local[j] = a[i + j];
                 }
 
             read2:
                 for (unsigned int j = 0; j < chunk_size; j++)
                 {
-                    v2_local[i] = b[i + j];
+                    v2_local[j] = b[i + j];
                 }
 
             compute:
                 for (unsigned int j = 0; j < chunk_size; j++)
                 {
-                    v3_local[i] = v1_local[j] * v2_local[j];
+                    v3_local[j] = v1_local[j] * v2_local[j];
                 }
 
             write:
