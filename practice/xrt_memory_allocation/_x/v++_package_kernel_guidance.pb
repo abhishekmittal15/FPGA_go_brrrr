@@ -1,3 +1,0 @@
-
-‘
-v++_package_kernel$e8d9a098-e4a4-46dc-b7c5-ad574cea636büv++  -p ./build/kernel.link.xclbin -t sw_emu --platform /home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2/xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm --package.out_dir ./package.sw_emu -o ./build/kernel.xclbin *s"o/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/_x/reports/package/v++_package_kernel_guidance.html2a"]/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/_x/v++_package_kernel_guidance.pb

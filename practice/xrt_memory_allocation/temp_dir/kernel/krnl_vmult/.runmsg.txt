@@ -1,2 +1,0 @@
-performing high-level synthesis for kernel: krnl_vmult
-Log file: /home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/kernel/krnl_vmult/vitis_hls.log
