@@ -1,7 +1,7 @@
 #include<iostream>
 #include<vector>
 #include "xcl2.hpp"
-#include "event_timer.hpp"
+// #include "event_timer.hpp"
 
 using std::cout;
 using std::endl;
@@ -34,7 +34,6 @@ int main(int argc,char **argv){
     cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
     cout << "Read the binary File :  " << filename << endl;
 
-
     cl::Device device;
     cl::Context context;
     cl::CommandQueue q;
@@ -42,17 +41,19 @@ int main(int argc,char **argv){
     cl::Kernel kernel;
     cl_int err;
 
+    bool valid_device = true;
+
     cout << "OpenCL Initialisation" << endl;
     std::vector<cl::Device> devices=xcl::get_xil_devices();
     for (unsigned int i = 0; i < devices.size();i++){
         device=devices[i];
         OCL_CHECK(err,context=cl::Context(device,NULL,NULL,NULL,&err));
-        OCL_CHECK(err, q = cl::CommandQueue(device, context, CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_ENABLE, &err));
+        OCL_CHECK(err, q = cl::CommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &err));
         cout << "Trying to program the device [" << i << "] : " << device.getInfo<CL_DEVICE_NAME>() << endl;
-        program = cl::Program(context, {device}, bins, &err);
+        program = cl::Program(context, {device}, bins, NULL,&err);
         if(err==CL_SUCCESS){
             cout << "Successfully programmed the device [" << i << "] : " << device.getInfo<CL_DEVICE_NAME>() << endl;
-            OCL_CHECK(err, kernel = cl::Kernel(device, context, &err));
+            OCL_CHECK(err, kernel = cl::Kernel(program,"krnl_vmult", &err));
             cout << "Successfully created the Kernel" << endl;
             valid_device = true;
             break;
@@ -112,6 +113,7 @@ int main(int argc,char **argv){
 
     cout << "Fetching the results from the device onto the host" << endl;
     int *hw = (int *)q.enqueueMapBuffer(hw_buf, CL_TRUE, CL_MAP_READ, 0, size_bytes);
+    q.finish();
     cout << "Fetch the output from the device" << endl;
 
     bool verified = true;
@@ -120,7 +122,7 @@ int main(int argc,char **argv){
             verified = false;
             cout << "Software and hardware results dont match" << endl;
         }
-        cout << i << " " << a[i] << " + " << b[i] << " = " << sw[i] << " | " << hw[i] << endl;
+        cout << i << " " << a[i] << " * " << b[i] << " = " << sw[i] << " | " << hw[i] << endl;
     }
 
     q.enqueueUnmapMemObject(a_buf, a);

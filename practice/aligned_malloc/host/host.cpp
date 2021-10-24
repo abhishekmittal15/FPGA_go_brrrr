@@ -66,6 +66,14 @@ int main(int argc,char **argv){
     float *sw = new float[num_elements];
     float *hw = new float[num_elements];
     unsigned int size_bytes = num_elements * sizeof(float);
+    int ret = posix_memalign((void **)&a, 4096, size_bytes);
+    ret |= posix_memalign((void **)&b, 4096, size_bytes);
+    ret |= posix_memalign((void **)&sw, 4096, size_bytes);
+    ret |= posix_memalign((void **)&hw, 4096, size_bytes);
+    if(ret!=0){
+        cout << "Error allocaitng aligned memory" << endl;
+        return EXIT_FAILURE;
+    }
 
     // Step 2: Align the Memories 
 

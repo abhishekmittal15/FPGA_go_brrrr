@@ -1,0 +1,170 @@
+<ENTRY>
+{
+ "thisFile": "/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/kernel.xo.compile_summary",
+ "connectId": "",
+ "serverToken": "",
+ "timestamp": "0"
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_CmdStep",
+ "dateTimestamp": "Sun Oct 24 09:42:11 2021",
+ "timestampMillis": "1635068531285",
+ "buildStep": {
+  "cmdId": "e35737a5-0189-4bb4-87ec-fe3a39f6f1bf",
+  "name": "v++",
+  "logFile": "/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/kernel/kernel.steps.log",
+  "commandLine": "/tools/Xilinx/Vitis/2021.1/bin/unwrapped/lnx64.o/v++  --vivado.prop \"run.__KERNEL__.{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}={-directive sdx_optimization_effort_high}\" --advanced.misc \"report=type report_timing_summary name impl_report_timing_summary_route_design_summary steps {route_design} runs {impl_1} options {-max_paths 10}\" --advanced.misc \"report=type report_timing_summary name impl_report_timing_summary_post_route_phys_opt_design_summary steps {post_route_phys_opt_design} runs {impl_1} options {-max_paths 10}\" --target sw_emu --platform /home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2/xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm --save-temps -g --temp_dir temp_dir -o kernel.xo kernel/kernel.cpp -c -k krnl_vmult -I./include ",
+  "args": [
+   "--target",
+   "sw_emu",
+   "--platform",
+   "/home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2/xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm",
+   "--save-temps",
+   "-g",
+   "--temp_dir",
+   "temp_dir",
+   "-o",
+   "kernel.xo",
+   "kernel/kernel.cpp",
+   "-c",
+   "-k",
+   "krnl_vmult",
+   "-I./include"
+  ],
+  "iniFiles": [],
+  "cwd": "/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Sun Oct 24 09:42:11 2021",
+ "timestampMillis": "1635068531285",
+ "status": {
+  "cmdId": "e35737a5-0189-4bb4-87ec-fe3a39f6f1bf",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_FlowMetaData",
+ "dateTimestamp": "Sun Oct 24 09:42:17 2021",
+ "timestampMillis": "1635068537778",
+ "buildSummary": {
+  "hardwarePlatform": "xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm",
+  "hardwareDsa": "xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xsa",
+  "platformDirectory": "/home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2",
+  "runtime": "OpenCL",
+  "systemConfig": "Linux",
+  "flow": "BF_COMPILE",
+  "target": "TT_SW_EMU",
+  "kernels": [
+   {
+    "base": {
+     "type": "KERNEL",
+     "name": "krnl_vmult",
+     "file": "/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/kernel.xo",
+     "reports": [],
+     "uuid": ""
+    },
+    "sources": [
+     "/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/kernel/kernel.cpp"
+    ],
+    "psSources": [],
+    "cuNames": [],
+    "type": "HLS",
+    "frequency": 0,
+    "freqUnits": ""
+   }
+  ],
+  "toolVersion": "Vitis V++ Compiler Release 2021.1. SW Build 3246112 on 2021-06-09-14:19:56"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Sun Oct 24 09:42:17 2021",
+ "timestampMillis": "1635068537781",
+ "buildStep": {
+  "cmdId": "ec99753e-b31d-457f-9128-ca69d293607c",
+  "name": "vitis_hls",
+  "logFile": "/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/kernel/krnl_vmult/vitis_hls.log",
+  "commandLine": "vitis_hls -f /home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/kernel/krnl_vmult/krnl_vmult.tcl -messageDb vitis_hls.pb",
+  "args": [
+   "vitis_hls",
+   "-f",
+   "/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/kernel/krnl_vmult/krnl_vmult.tcl",
+   "-messageDb",
+   "vitis_hls.pb"
+  ],
+  "iniFiles": [],
+  "cwd": "/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Sun Oct 24 09:42:17 2021",
+ "timestampMillis": "1635068537782",
+ "status": {
+  "cmdId": "ec99753e-b31d-457f-9128-ca69d293607c",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Sun Oct 24 09:42:25 2021",
+ "timestampMillis": "1635068545773",
+ "status": {
+  "cmdId": "ec99753e-b31d-457f-9128-ca69d293607c",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Sun Oct 24 09:42:25 2021",
+ "timestampMillis": "1635068545834",
+ "report": {
+  "path": "/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/reports/kernel/v++_compile_kernel_guidance.html",
+  "name": "",
+  "fileType": "HTML",
+  "reportType": "GLOBAL_RULECHECK_GUIDANCE",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Sun Oct 24 09:42:25 2021",
+ "timestampMillis": "1635068545835",
+ "report": {
+  "path": "/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/v++_compile_kernel_guidance.pb",
+  "name": "",
+  "fileType": "BINARY_PROTOBUF",
+  "reportType": "GLOBAL_RULECHECK_GUIDANCE",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Sun Oct 24 09:42:25 2021",
+ "timestampMillis": "1635068545835",
+ "status": {
+  "cmdId": "e35737a5-0189-4bb4-87ec-fe3a39f6f1bf",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>

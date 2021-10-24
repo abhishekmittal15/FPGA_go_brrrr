@@ -1,0 +1,13 @@
+#-----------------------------------------------------------
+# Vitis Analyzer v2021.1 (64-bit)
+# SW Build 3247384 on Thu Jun 10 19:36:07 MDT 2021
+# 
+# Start of session at: Tue Oct 19 20:09:07 2021
+# Process ID: 21799
+# Current directory: /home/ec2-user/FPGA_go_brrrr/practice/aligned_malloc/build
+# Command line: vitis_analyzer
+# Log file: /home/ec2-user/FPGA_go_brrrr/practice/aligned_malloc/build/vitis_analyzer.log
+# Journal file: /home/ec2-user/FPGA_go_brrrr/practice/aligned_malloc/build/vitis_analyzer.jou
+#-----------------------------------------------------------
+start_gui
+create_project dummy

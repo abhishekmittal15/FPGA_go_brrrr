@@ -1,0 +1,48 @@
+XRT Build Version: 2.11.0 (2021.1)
+       Build Date: 2021-08-09 02:13:28
+          Hash ID: 789dc49cc2c1201f181a0740bd1aa6fa17987091
+Creating a default 'in-memory' xclbin image.
+
+Section: 'BITSTREAM'(0) was successfully added.
+Size   : 194632 bytes
+Format : RAW
+File   : '/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/link/int/kernel.link.so'
+
+Section: 'MEM_TOPOLOGY'(6) was successfully added.
+Format : JSON
+File   : 'mem_topology'
+
+Section: 'IP_LAYOUT'(8) was successfully added.
+Format : JSON
+File   : 'ip_layout'
+
+Section: 'CONNECTIVITY'(7) was successfully added.
+Format : JSON
+File   : 'connectivity'
+WARNING: Skipping CLOCK_FREQ_TOPOLOGY section for count size is zero.
+WARNING: Section 'CLOCK_FREQ_TOPOLOGY' content is empty.  No data in the given JSON file.
+
+Section: 'CLOCK_FREQ_TOPOLOGY'(11) was empty.  No action taken.
+Format : JSON
+File   : '/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/link/int/kernel.link_xml.rtd'
+
+Section: 'BUILD_METADATA'(14) was successfully added.
+Size   : 2250 bytes
+Format : JSON
+File   : '/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/link/int/kernel.link_build.rtd'
+
+Section: 'EMBEDDED_METADATA'(2) was successfully added.
+Size   : 2441 bytes
+Format : RAW
+File   : '/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/link/int/kernel.link.xml'
+
+Section: 'DEBUG_DATA'(4) was successfully added.
+Size   : 0 bytes
+Format : RAW
+File   : '/dev/null'
+
+Section: 'PARTITION_METADATA'(20) was successfully appended to.
+Format : JSON
+File   : 'partition_metadata'
+Successfully wrote (208029 bytes) to the output file: /home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/./build/kernel.link.xclbin
+Leaving xclbinutil.

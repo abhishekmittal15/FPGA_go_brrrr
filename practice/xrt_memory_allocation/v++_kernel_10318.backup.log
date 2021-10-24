@@ -1,0 +1,21 @@
+INFO: [v++ 60-1306] Additional information associated with this v++ compile can be found at:
+	Reports: /home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/reports/kernel
+	Log files: /home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/logs/kernel
+INFO: [v++ 60-1548] Creating build summary session with primary output /home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/kernel.xo.compile_summary, at Sun Oct 24 09:23:24 2021
+INFO: [v++ 60-1316] Initiating connection to rulecheck server, at Sun Oct 24 09:23:24 2021
+INFO: [v++ 60-1315] Creating rulecheck session with output '/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/reports/kernel/v++_compile_kernel_guidance.html', at Sun Oct 24 09:23:25 2021
+INFO: [v++ 60-895]   Target platform: /home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2/xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm
+INFO: [v++ 60-1578]   This platform contains Xilinx Shell Archive '/home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2/hw/xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xsa'
+INFO: [v++ 74-78] Compiler Version string: 2021.1
+INFO: [v++ 60-1302] Platform 'xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm' has been explicitly enabled for this release.
+INFO: [v++ 60-585] Compiling for software emulation target
+INFO: [v++ 60-423]   Target device: xilinx_aws-vu9p-f1_shell-v04261818_201920_2
+INFO: [v++ 60-242] Creating kernel: 'krnl_vadd'
+
+===>The following messages were generated while  performing high-level synthesis for kernel: krnl_vadd Log file: /home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/kernel/krnl_vadd/vitis_hls.log :
+ERROR: [v++ 214-157] Top function not found: there is no function named 'krnl_vadd'
+ERROR: [v++ 60-300] Failed to build kernel(ip) krnl_vadd, see log for details: /home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/kernel/krnl_vadd/vitis_hls.log
+ERROR: [v++ 60-773] In '/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/kernel/krnl_vadd/vitis_hls.log', caught Tcl error: ERROR: [HLS 214-157] Top function not found: there is no function named 'krnl_vadd'
+ERROR: [v++ 60-599] Kernel compilation failed to complete
+ERROR: [v++ 60-592] Failed to finish compilation
+INFO: [v++ 60-1653] Closing dispatch client.

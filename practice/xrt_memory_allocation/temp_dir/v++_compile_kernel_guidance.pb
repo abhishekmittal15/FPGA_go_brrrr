@@ -1,0 +1,3 @@
+
+¨
+v++_compile_kernel$7a327e7c-0190-4b0f-a71a-c00969c29a2fˆv++  --target sw_emu --platform /home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2/xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm --save-temps -g --temp_dir temp_dir -o kernel.xo kernel/kernel.cpp -c -k krnl_vmult -I./include *x"t/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/reports/kernel/v++_compile_kernel_guidance.html2g"c/home/ec2-user/FPGA_go_brrrr/practice/xrt_memory_allocation/temp_dir/v++_compile_kernel_guidance.pb
