@@ -1,21 +1,23 @@
 #include<iostream>
 #include<vector>
+#include "xcl2.hpp"
 
 using std::cout;
 using std::endl;
 
 void init(float *a,float *b,float *sw,float *hw,unsigned int num_elements){
     for (unsigned int i = 0; i < num_elements;i++){
-        a[i] = std::rand() / RAND_MAX;
-        b[i] = std::rand() / RAND_MAX;
+        a[i] = (float)(std::rand()) /(float)(RAND_MAX);
+        b[i] = (float)(std::rand()) / (float)(RAND_MAX);
         sw[i] = 0.0;
         hw[i] = 0.0;
+        cout <<i<<" "<< a[i] << " " << b[i] << " " << sw[i] << " " << endl;
     }
 }
 
 void host_side_comp(float* a,float* b,float* sw,unsigned int num_elements){
     for (unsigned int i = 0; i < num_elements;i++)
-        sw[i] = a[i] + b[i];
+        sw[i] = a[i] * b[i];
 }
 
 int main(int argc,char **argv){
@@ -33,13 +35,23 @@ int main(int argc,char **argv){
 
     cout << "OPENCL Initialisation started" << endl;
 
+    cl::Device device;
+    cl::Context context;
+    cl::CommandQueue q;
+    cl::Kernel kernel;
+    cl::Program program;
+    cl::Event event_sp;
+    cl_int err;
+
+    bool valid_device = false;
+
     std::vector<cl::Device> devices = xcl::get_xil_devices();
     for(unsigned int i=0;i<devices.size();i++){
         device=devices[i];
         OCL_CHECK(err,context=cl::Context(device,NULL,NULL,NULL,&err));
         OCL_CHECK(err, q = cl::CommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &err));
-        cout<<"Trying to program the device "
-        err = cl::Program(context, {device}, NULL, &err);
+        cout << "Trying to program the device [" << i << "] : " << device.getInfo<CL_DEVICE_NAME>() << endl;
+        program = cl::Program(context, {device},bins, NULL, &err);
 
         if(err!=CL_SUCCESS){
             cout << "Unable to program the device[" << i << "] : " << device.getInfo<CL_DEVICE_NAME>() << endl;
@@ -63,10 +75,10 @@ int main(int argc,char **argv){
 
     cout << "Buffer creation started" << endl;
 
-    OCL_CHECK(err, cl::Buffer a_buf(context, static_cast<cl_mem_flags>(CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, NULL));
-    OCL_CHECK(err, cl::Buffer b_buf(context, static_cast<cl_mem_flags>(CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, NULL));
-    OCL_CHECK(err, cl::Buffer sw_buf(context, static_cast<cl_mem_flags>(CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, NULL));
-    OCL_CHECK(err, cl::Buffer hw_buf(context, static_cast<cl_mem_flags>(CL_MEM_WRITE_ONLY | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, NULL));
+    OCL_CHECK(err, cl::Buffer a_buf(context, static_cast<cl_mem_flags>(CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, &err));
+    OCL_CHECK(err, cl::Buffer b_buf(context, static_cast<cl_mem_flags>(CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, &err));
+    OCL_CHECK(err, cl::Buffer sw_buf(context, static_cast<cl_mem_flags>(CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, &err));
+    OCL_CHECK(err, cl::Buffer hw_buf(context, static_cast<cl_mem_flags>(CL_MEM_WRITE_ONLY | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, &err));
 
     cout << "Buffers creation ended" << endl;
 
@@ -75,57 +87,68 @@ int main(int argc,char **argv){
     unsigned int nargs = 0;
     OCL_CHECK(err, kernel.setArg(nargs++, a_buf));
     OCL_CHECK(err, kernel.setArg(nargs++, b_buf));
-    OCL_CHECK(err, kernel.setArg(nargs++, sw_buf));
     OCL_CHECK(err, kernel.setArg(nargs++, hw_buf));
+    OCL_CHECK(err, kernel.setArg(nargs++, num_elements));
 
     cout<<"Set the Kernel Arguments"<<endl;
 
     cout<<"Mapping the buffers to the user space pointer"<<endl;
 
-    float *a = (float *)q.enqueueMapBuffer(a_buf);
-    float *b = (float *)q.enqueueMapBuffer(b_buf);
-    float *sw = (float *)q.enqueueMapBuffer(sw_buf);
-    float *hw = (float *)q.enqueueMapBuffer(hw_buf);
+    float *a = (float *)q.enqueueMapBuffer(a_buf,CL_TRUE,CL_MAP_WRITE,0,size_bytes);
+    float *b = (float *)q.enqueueMapBuffer(b_buf, CL_TRUE, CL_MAP_WRITE, 0, size_bytes);
+    float *sw = (float *)q.enqueueMapBuffer(sw_buf,CL_TRUE,CL_MAP_WRITE | CL_MAP_READ,0,size_bytes);
 
     cout<<"Finished mapping the buffers to the user space pointers"<<endl;
 
     cout << "Filling data in the user space pointers" << endl;
-    init(a, b, sw, hw, num_elements);
+    // init(a, b, sw, hw, num_elements);
+    float *temp = new float[num_elements];
+    init(a, b, sw,temp, num_elements);
     cout << "Finished filling the data in the host memory" << endl;
 
     cout << "Starting Host Side Computation" << endl;
     host_side_comp(a, b, sw, num_elements);
     cout << "Finished host side computation" << endl;
 
-    cout<<"Migrating the memory objects from the host to the device"<<endl;
     std::vector<cl::Memory> inBuf, outBuf;
+
+    cout<<"Migrating the memory objects from the host to the device"<<endl;
     inBuf.push_back(a_buf);
     inBuf.push_back(b_buf);
-    cl::Event event_sp;
+
     OCL_CHECK(err, q.enqueueMigrateMemObjects(inBuf, 0,NULL,&event_sp));
-    cl_wait_for_events(&event_sp);
+    clWaitForEvents(1, (const cl_event *)&event_sp);
     cout << "Finished migrating the memories from the host side to the device" << endl;
 
     cout << "Launching the Kernel" << endl;
-    q.enqueueTask(kernel,event_sp);
-    cl_wait_for_events(event_sp);
+    q.enqueueTask(kernel,NULL,&event_sp);
+    clWaitForEvents(1, (const cl_event *)&event_sp);
     cout << "Finished the kernel execution" << endl;
 
-    cout<<"Migrating the memory objects from the device to the host side"
-    outBuf.push_back(hw_buf);
-    q.enqueueMigrateMemObjects(outBuf,CL_MEM_HOST_SIDE,NULL,&event_sp);
-    cl_wait_for_events(&event_sp);
-    cout << "Fetched the results from the device to the host" << endl;
+    // cout << "Migrating the memory objects from the device to the host side" << endl;
+    // outBuf.push_back(hw_buf);
+    // q.enqueueMigrateMemObjects(outBuf, CL_MIGRATE_MEM_OBJECT_HOST, NULL, &event_sp);
+    // clWaitForEvents(1, (const cl_event *)&event_sp);
+    // cout << "Fetched the results from the device to the host" << endl;
+
+    float *hw = (float *)q.enqueueMapBuffer(hw_buf, CL_TRUE, CL_MAP_READ, 0, size_bytes);
 
     bool verified = true;
     for (unsigned int i = 0; i < num_elements;i++){
-        if(sw[i]!=hw[i]){
+        cout << i << " : " << a[i] << " * " << b[i] << " = " << sw[i] << " | " << hw[i] << endl;
+        if (sw[i] != hw[i])
+        {
             cout << "Results dont match" << endl;
-            cout << i << " : " << a[i] << " * " << b[i] << " = " << sw[i] << " | " << hw[i] << endl;
             break;
             verified = false;
         }
     }
+
+    q.enqueueUnmapMemObject(a_buf, a);
+    q.enqueueUnmapMemObject(b_buf, b);
+    q.enqueueUnmapMemObject(sw_buf, sw);
+    q.enqueueUnmapMemObject(hw_buf, hw);
+    q.finish(); // Add this to avoid getting segmentation fault 
 
     return (verified == true) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

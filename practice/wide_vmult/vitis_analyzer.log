@@ -1,0 +1,15 @@
+#-----------------------------------------------------------
+# Vitis Analyzer v2021.1 (64-bit)
+# SW Build 3247384 on Thu Jun 10 19:36:07 MDT 2021
+# 
+# Start of session at: Mon Oct 25 14:22:51 2021
+# Process ID: 22876
+# Current directory: /home/ec2-user/FPGA_go_brrrr/practice/wide_vmult
+# Command line: vitis_analyzer xclbin.run_summary
+# Log file: /home/ec2-user/FPGA_go_brrrr/practice/wide_vmult/vitis_analyzer.log
+# Journal file: /home/ec2-user/FPGA_go_brrrr/practice/wide_vmult/vitis_analyzer.jou
+#-----------------------------------------------------------
+start_gui
+create_project dummy
+exit
+INFO: [Common 17-206] Exiting vitis_analyzer at Mon Oct 25 14:31:20 2021...

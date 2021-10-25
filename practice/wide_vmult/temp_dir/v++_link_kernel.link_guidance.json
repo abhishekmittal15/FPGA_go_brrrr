@@ -1,0 +1,41 @@
+{
+ "session": {
+  "name": "v++_link_kernel.link",
+  "uuid": "d8e76c77-2733-4159-962d-8c53fd5f9db3",
+  "description": "v++ --xp param:compiler.lockFlowCritSlackThreshold=0 --xp vivado_param:hd.routingContainmentAreaExpansion=true --xp vivado_param:hd.supportClockNetCrossDiffReconfigurablePartitions=1 --xp vivado_param:bitstream.enablePR=4123 --xp vivado_param:physynth.ultraRAMOptOutput=false --xp vivado_prop:run.__KERNEL__.{STEPS.SYNTH_DESIGN.ARGS.MAX_URAM_CASCADE_HEIGHT}={1} --xp vivado_param:synth.elaboration.rodinMoreOptions={rt::set_parameter disableOregPackingUram true}  -g --target sw_emu --platform /home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2/xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm --save-temps --temp_dir temp_dir --config design.cfg -l -o./build/kernel.link.xclbin kernel.xo ",
+  "timestamp": "0",
+  "report_file": {
+   "scheme": "FILE",
+   "host": "",
+   "port": 0,
+   "path": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vmult/temp_dir/reports/link/v++_link_kernel.link_guidance.html",
+   "query": "",
+   "fragment": "",
+   "media_type": "",
+   "encoding": "",
+   "data": ""
+  },
+  "proto_file": {
+   "scheme": "FILE",
+   "host": "",
+   "port": 0,
+   "path": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vmult/temp_dir/v++_link_kernel.link_guidance.pb",
+   "query": "",
+   "fragment": "",
+   "media_type": "",
+   "encoding": "",
+   "data": ""
+  },
+  "build_target": "",
+  "config_files": [
+   {
+    "fileName": "design.cfg",
+    "contents": "debug=1\nprofile_kernel=data:all:all:all\n\n[connectivity]\nnk=wide_krnl:1:wide_krnl"
+   }
+  ]
+ },
+ "violation_count": 0,
+ "waived_count": 0,
+ "affirmation_count": 0
+}
+

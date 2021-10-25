@@ -35,9 +35,10 @@ ld_flags += -lrt -lstdc++ -lxilinxopencl -lpthread
 
 ###### Setting Kernel variables ######
 vpp := v++
-vpp_flags := --target $(TARGET) --platform $(device) --save-temps -g 
+vpp_flags := -g --target $(TARGET) --platform $(device) --save-temps  
 vpp_flags += --temp_dir $(TEMP_DIR) 
-vpp_ldflags :=
+vpp_flags += --config design.cfg
+vpp_ldflags := 
 ####################################
 
 ###### Build the host ##############

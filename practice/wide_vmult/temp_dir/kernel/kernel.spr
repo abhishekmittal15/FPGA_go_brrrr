@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="kernel" dir="">
+  <FileSets>
+    <FileSet Name="kernel_wide_krnl" Type="DesignSrcs">
+      <File Path="/home/ec2-user/FPGA_go_brrrr/practice/wide_vmult/kernel/kernel.cpp"/>
+      <Config/>
+    </FileSet>
+  </FileSets>
+  <Runs/>
+</project>
