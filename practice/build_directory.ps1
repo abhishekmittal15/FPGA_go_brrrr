@@ -5,8 +5,8 @@ Set-Location $current_directory/$var
 
 # Create the Makefiles and the xrt.ini and config.ini files 
 Copy-Item ..\..\common\Makefile .
-New-Item config.ini 
-New-Item xrt.ini
+Copy-Item ..\..\design.cfg
+Copy-Item ..\..\xrt.ini
 
 # Creating the host folder 
 mkdir host 

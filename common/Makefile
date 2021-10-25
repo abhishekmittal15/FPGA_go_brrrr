@@ -37,6 +37,7 @@ ld_flags += -lrt -lstdc++ -lxilinxopencl -lpthread
 vpp := v++
 vpp_flags := --target $(TARGET) --platform $(device) --save-temps -g 
 vpp_flags += --temp_dir $(TEMP_DIR) 
+vpp_flags += --config design.cfg
 vpp_ldflags :=
 ####################################
 
@@ -69,10 +70,10 @@ emconfig:
 run: $(EXECUTABLE) kernel.xo $(BINARY) emconfig
 ifneq ($(TARGET),hw)
 	cp -rf $(TEMP_DIR)/emconfig.json .
-	XCL_EMULATION_MODE=$(TARGET) ./host_exe $(NUM_ELEMENTS) $(build_folder)/kernel.xclbin 
 	@echo 
 	@echo 
 	@echo RUNTIME RESULTS
+	XCL_EMULATION_MODE=$(TARGET) ./host_exe $(NUM_ELEMENTS) $(build_folder)/kernel.xclbin 
 else
 	./host 
 endif
