@@ -99,13 +99,13 @@ int main(int argc,char **argv){
     float *a = (float *)q.enqueueMapBuffer(a_buf, CL_TRUE, CL_MAP_WRITE, 0, size_bytes);
     float *b = (float *)q.enqueueMapBuffer(b_buf, CL_TRUE, CL_MAP_WRITE, 0, size_bytes);
     float *sw = (float *)q.enqueueMapBuffer(sw_buf,CL_TRUE,CL_MAP_WRITE | CL_MAP_READ,0,size_bytes);
-    // float *hw = (float *)q.enqueueMapBuffer(hw_buf, CL_TRUE, CL_MAP_READ, 0, size_bytes);
+    float *hw = (float *)q.enqueueMapBuffer(hw_buf, CL_TRUE, CL_MAP_READ, 0, size_bytes);
     // cout<<"Finished mapping the buffers to the user space pointers"<<endl;
 
     et.add("Filling data in the user space pointers");
-    // init(a, b, sw, hw, num_elements);
-    float *temp = new float[num_elements];
-    init(a, b, sw,temp, num_elements);
+    init(a, b, sw, hw, num_elements);
+    // float *temp = new float[num_elements];
+    // init(a, b, sw,temp, num_elements);
     // cout << "Finished filling the data in the host memory" << endl;
 
     et.add("Starting Host Side Computation");
@@ -129,12 +129,12 @@ int main(int argc,char **argv){
     // cout << "Finished the kernel execution" << endl;
 
     et.add("Mapping the output buffer into the host pointer");
-    // outBuf.push_back(hw_buf);
-    // q.enqueueMigrateMemObjects(outBuf, CL_MIGRATE_MEM_OBJECT_HOST, NULL, &event_sp);
-    // clWaitForEvents(1, (const cl_event *)&event_sp);
+    outBuf.push_back(hw_buf);
+    q.enqueueMigrateMemObjects(outBuf, CL_MIGRATE_MEM_OBJECT_HOST, NULL, &event_sp);
+    clWaitForEvents(1, (const cl_event *)&event_sp);
     // cout << "Fetched the results from the device to the host" << endl;
 
-    float *hw = (float *)q.enqueueMapBuffer(hw_buf, CL_TRUE, CL_MAP_READ, 0, size_bytes);
+    // float *hw = (float *)q.enqueueMapBuffer(hw_buf, CL_TRUE, CL_MAP_READ, 0, size_bytes);
     et.finish();
 
     bool verified = true;
