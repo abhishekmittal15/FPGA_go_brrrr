@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include "xcl2.hpp"
+#include "event_timer.hpp"
 
 using std::cout;
 using std::endl;
@@ -33,7 +34,7 @@ int main(int argc,char **argv){
     auto BinaryFile = xcl::read_binary_file(filename);
     cl::Program::Binaries bins{{BinaryFile.data(), BinaryFile.size()}};
 
-    cout << "OPENCL Initialisation started" << endl;
+    et.add("OPENCL Initialisation started");
 
     cl::Device device;
     cl::Context context;
@@ -71,18 +72,18 @@ int main(int argc,char **argv){
         return EXIT_FAILURE;
     }
 
-    cout<<"OPENCL Initialisation ended"<<endl;
+    // cout<<"OPENCL Initialisation ended"<<endl;
 
-    cout << "Buffer creation started" << endl;
+    et.add("Buffer creation started");
 
     OCL_CHECK(err, cl::Buffer a_buf(context, static_cast<cl_mem_flags>(CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, &err));
     OCL_CHECK(err, cl::Buffer b_buf(context, static_cast<cl_mem_flags>(CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, &err));
     OCL_CHECK(err, cl::Buffer sw_buf(context, static_cast<cl_mem_flags>(CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, &err));
     OCL_CHECK(err, cl::Buffer hw_buf(context, static_cast<cl_mem_flags>(CL_MEM_WRITE_ONLY | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, &err));
 
-    cout << "Buffers creation ended" << endl;
+    // cout << "Buffers creation ended" << endl;
 
-    cout << "Setting the Kernel arguments" << endl;
+    et.add("Setting the Kernel arguments");
 
     unsigned int nargs = 0;
     OCL_CHECK(err, kernel.setArg(nargs++, a_buf));
@@ -90,42 +91,42 @@ int main(int argc,char **argv){
     OCL_CHECK(err, kernel.setArg(nargs++, hw_buf));
     OCL_CHECK(err, kernel.setArg(nargs++, num_elements));
 
-    cout<<"Set the Kernel Arguments"<<endl;
+    // cout<<"Set the Kernel Arguments"<<endl;
 
-    cout<<"Mapping the buffers to the user space pointer"<<endl;
+    et.add("Mapping the buffers to the user space pointer");
 
-    float *a = (float *)q.enqueueMapBuffer(a_buf,CL_TRUE,CL_MAP_WRITE,0,size_bytes);
+    float *a = (float *)q.enqueueMapBuffer(a_buf, CL_TRUE, CL_MAP_WRITE, 0, size_bytes);
     float *b = (float *)q.enqueueMapBuffer(b_buf, CL_TRUE, CL_MAP_WRITE, 0, size_bytes);
     float *sw = (float *)q.enqueueMapBuffer(sw_buf,CL_TRUE,CL_MAP_WRITE | CL_MAP_READ,0,size_bytes);
 
-    cout<<"Finished mapping the buffers to the user space pointers"<<endl;
+    // cout<<"Finished mapping the buffers to the user space pointers"<<endl;
 
-    cout << "Filling data in the user space pointers" << endl;
+    et.add("Filling data in the user space pointers");
     // init(a, b, sw, hw, num_elements);
     float *temp = new float[num_elements];
     init(a, b, sw,temp, num_elements);
-    cout << "Finished filling the data in the host memory" << endl;
+    // cout << "Finished filling the data in the host memory" << endl;
 
-    cout << "Starting Host Side Computation" << endl;
+    et.add("Starting Host Side Computation");
     host_side_comp(a, b, sw, num_elements);
-    cout << "Finished host side computation" << endl;
+    // cout << "Finished host side computation" << endl;
 
     std::vector<cl::Memory> inBuf, outBuf;
 
-    cout<<"Migrating the memory objects from the host to the device"<<endl;
+    et.add("Migrating the memory objects from the host to the device");
     inBuf.push_back(a_buf);
     inBuf.push_back(b_buf);
 
     OCL_CHECK(err, q.enqueueMigrateMemObjects(inBuf, 0,NULL,&event_sp));
     clWaitForEvents(1, (const cl_event *)&event_sp);
-    cout << "Finished migrating the memories from the host side to the device" << endl;
+    // cout << "Finished migrating the memories from the host side to the device" << endl;
 
-    cout << "Launching the Kernel" << endl;
-    q.enqueueTask(kernel,NULL,&event_sp);
+    et.add("Launching the Kernel");
+    q.enqueueTask(kernel, NULL, &event_sp);
     clWaitForEvents(1, (const cl_event *)&event_sp);
-    cout << "Finished the kernel execution" << endl;
+    // cout << "Finished the kernel execution" << endl;
 
-    // cout << "Migrating the memory objects from the device to the host side" << endl;
+    et.add("Mapping the output buffer into the host pointer")
     // outBuf.push_back(hw_buf);
     // q.enqueueMigrateMemObjects(outBuf, CL_MIGRATE_MEM_OBJECT_HOST, NULL, &event_sp);
     // clWaitForEvents(1, (const cl_event *)&event_sp);
@@ -144,11 +145,14 @@ int main(int argc,char **argv){
         }
     }
 
+    et.add("Unmapping or freeing all the buffers");
     q.enqueueUnmapMemObject(a_buf, a);
     q.enqueueUnmapMemObject(b_buf, b);
     q.enqueueUnmapMemObject(sw_buf, sw);
     q.enqueueUnmapMemObject(hw_buf, hw);
-    q.finish(); // Add this to avoid getting segmentation fault 
-
+    q.finish(); // Add this to avoid getting segmentation fault
+    
+    et.print();
+    
     return (verified == true) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
