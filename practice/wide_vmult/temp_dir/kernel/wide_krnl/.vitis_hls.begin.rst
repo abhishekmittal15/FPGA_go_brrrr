@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<ProcessHandle Version="1" Minor="0">
-    <Process Command="vitis_hls" Owner="ec2-user" Host="ip-172-31-34-244.ec2.internal" Pid="21149" HostCore="8" HostMemory="32464404">
-    </Process>
-</ProcessHandle>

@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<Runs Version="1" Minor="0">
-	<Run Id="wide_krnl" LaunchDir="/home/ec2-user/FPGA_go_brrrr/practice/wide_vmult/temp_dir/kernel/wide_krnl" FlowId="Build_IP" FromStepId="vitis_hls" ToStepId="vitis_hls"/>
-</Runs>
-

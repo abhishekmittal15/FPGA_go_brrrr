@@ -1,3 +1,0 @@
-
-û
-v++_package_kernel$2f2cba8e-0d15-4210-9b8f-9a8c5401f87eüv++  -p ./build/kernel.link.xclbin -t sw_emu --platform /home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2/xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm --package.out_dir ./package.sw_emu -o ./build/kernel.xclbin *h"d/home/ec2-user/FPGA_go_brrrr/practice/wide_vmult/_x/reports/package/v++_package_kernel_guidance.html2V"R/home/ec2-user/FPGA_go_brrrr/practice/wide_vmult/_x/v++_package_kernel_guidance.pb
