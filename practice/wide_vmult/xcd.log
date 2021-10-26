@@ -1,20 +1,20 @@
-Mon Oct 25 14:22:07 2021: Running xcd server. This server was built by gradle.
-Mon Oct 25 14:22:07 2021: Server was asked to start on port: '46629'
-Mon Oct 25 14:22:07 2021: Server is using token UUID: '7083f1d3-0806-40d1-8c5d-f1e7008e009f'
-Mon Oct 25 14:22:07 2021: SESSION_MGR: creating session with session uuid: '6d04a3e9-ade5-4ab9-8d63-1f78fcd2ec76' and name 'default'
-Mon Oct 25 14:22:07 2021: Attempting to start server on port '46629'
-Mon Oct 25 14:22:07 2021: XCD main fifo: created main fifo '/tmp/xcdmain7083f1d3-0806-40d1-8c5d-f1e7008e009f', fd read = 13
-Mon Oct 25 14:22:07 2021: Running Dispatch Server
-Mon Oct 25 14:22:07 2021: Version 2.2.0
-Mon Oct 25 14:22:16 2021: Dispatch Server: Accepted socket connection from client
-Mon Oct 25 14:22:16 2021: Starting Socket connection
-Mon Oct 25 14:22:16 2021: EXCHANGE_TOKEN received, server token: 7083f1d3-0806-40d1-8c5d-f1e7008e009f, passed token: 7083f1d3-0806-40d1-8c5d-f1e7008e009f
-Mon Oct 25 14:22:17 2021: DISPATCH_HANDLER: Adding handler from function makeHandler in library libxv_system_diagram
-Mon Oct 25 14:22:17 2021: SESSION_MGR: creating session with session uuid: '00a9fe2e-17a9-499c-8b09-c318f39d764d' and name 'v++_package_kernel'
-Mon Oct 25 14:22:17 2021: KERNEL_SVC: creating session with uuid: '00a9fe2e-17a9-499c-8b09-c318f39d764d' and name 'v++_package_kernel'
-Mon Oct 25 14:22:17 2021: GUIDANCE_SMGR: creating guidance session with uuid: '00a9fe2e-17a9-499c-8b09-c318f39d764d' and name 'v++_package_kernel'
-Mon Oct 25 14:22:17 2021: SYSTEM_DIAGRAM_SMGR: creating diagram session with uuid: '00a9fe2e-17a9-499c-8b09-c318f39d764d' and name 'v++_package_kernel'
-Mon Oct 25 14:22:23 2021: SESSION_MGR: closing session for UUID '00a9fe2e-17a9-499c-8b09-c318f39d764d' with name 'v++_package_kernel'
-Mon Oct 25 14:22:23 2021: KERNEL_SVC: closing session for UUID '00a9fe2e-17a9-499c-8b09-c318f39d764d' with name 'v++_package_kernel'
-Mon Oct 25 14:22:23 2021: GUIDANCE_SMGR: closing session for UUID '00a9fe2e-17a9-499c-8b09-c318f39d764d' with name 'v++_package_kernel'
-Mon Oct 25 14:22:23 2021: SYSTEM_DIAGRAM_SMGR: closing session for UUID '00a9fe2e-17a9-499c-8b09-c318f39d764d' with name 'v++_package_kernel'
+Tue Oct 26 09:12:04 2021: Running xcd server. This server was built by gradle.
+Tue Oct 26 09:12:04 2021: Server was asked to start on port: '35161'
+Tue Oct 26 09:12:04 2021: Server is using token UUID: 'efc062ab-e2fb-4998-a2d4-d742b86363d3'
+Tue Oct 26 09:12:04 2021: SESSION_MGR: creating session with session uuid: '6d04a3e9-ade5-4ab9-8d63-1f78fcd2ec76' and name 'default'
+Tue Oct 26 09:12:04 2021: Attempting to start server on port '35161'
+Tue Oct 26 09:12:04 2021: XCD main fifo: created main fifo '/tmp/xcdmainefc062ab-e2fb-4998-a2d4-d742b86363d3', fd read = 13
+Tue Oct 26 09:12:04 2021: Running Dispatch Server
+Tue Oct 26 09:12:04 2021: Version 2.2.0
+Tue Oct 26 09:12:12 2021: Dispatch Server: Accepted socket connection from client
+Tue Oct 26 09:12:12 2021: Starting Socket connection
+Tue Oct 26 09:12:12 2021: EXCHANGE_TOKEN received, server token: efc062ab-e2fb-4998-a2d4-d742b86363d3, passed token: efc062ab-e2fb-4998-a2d4-d742b86363d3
+Tue Oct 26 09:12:13 2021: DISPATCH_HANDLER: Adding handler from function makeHandler in library libxv_system_diagram
+Tue Oct 26 09:12:13 2021: SESSION_MGR: creating session with session uuid: 'ee7a4d44-6cfc-46f9-bbc9-84b181d6481c' and name 'v++_package_kernel'
+Tue Oct 26 09:12:13 2021: KERNEL_SVC: creating session with uuid: 'ee7a4d44-6cfc-46f9-bbc9-84b181d6481c' and name 'v++_package_kernel'
+Tue Oct 26 09:12:13 2021: GUIDANCE_SMGR: creating guidance session with uuid: 'ee7a4d44-6cfc-46f9-bbc9-84b181d6481c' and name 'v++_package_kernel'
+Tue Oct 26 09:12:13 2021: SYSTEM_DIAGRAM_SMGR: creating diagram session with uuid: 'ee7a4d44-6cfc-46f9-bbc9-84b181d6481c' and name 'v++_package_kernel'
+Tue Oct 26 09:12:19 2021: SESSION_MGR: closing session for UUID 'ee7a4d44-6cfc-46f9-bbc9-84b181d6481c' with name 'v++_package_kernel'
+Tue Oct 26 09:12:19 2021: KERNEL_SVC: closing session for UUID 'ee7a4d44-6cfc-46f9-bbc9-84b181d6481c' with name 'v++_package_kernel'
+Tue Oct 26 09:12:19 2021: GUIDANCE_SMGR: closing session for UUID 'ee7a4d44-6cfc-46f9-bbc9-84b181d6481c' with name 'v++_package_kernel'
+Tue Oct 26 09:12:19 2021: SYSTEM_DIAGRAM_SMGR: closing session for UUID 'ee7a4d44-6cfc-46f9-bbc9-84b181d6481c' with name 'v++_package_kernel'

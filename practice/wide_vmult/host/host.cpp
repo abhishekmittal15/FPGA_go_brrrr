@@ -12,7 +12,6 @@ void init(float *a,float *b,float *sw,float *hw,unsigned int num_elements){
         b[i] = (float)(std::rand()) / (float)(RAND_MAX);
         sw[i] = 0.0;
         hw[i] = 0.0;
-        cout <<i<<" "<< a[i] << " " << b[i] << " " << sw[i] << " " << endl;
     }
 }
 
@@ -22,6 +21,8 @@ void host_side_comp(float* a,float* b,float* sw,unsigned int num_elements){
 }
 
 int main(int argc,char **argv){
+
+    EventTimer et;
 
     if(argc!=3){
         cout<<"Insufficient Arguments"<<endl;
@@ -98,7 +99,7 @@ int main(int argc,char **argv){
     float *a = (float *)q.enqueueMapBuffer(a_buf, CL_TRUE, CL_MAP_WRITE, 0, size_bytes);
     float *b = (float *)q.enqueueMapBuffer(b_buf, CL_TRUE, CL_MAP_WRITE, 0, size_bytes);
     float *sw = (float *)q.enqueueMapBuffer(sw_buf,CL_TRUE,CL_MAP_WRITE | CL_MAP_READ,0,size_bytes);
-
+    // float *hw = (float *)q.enqueueMapBuffer(hw_buf, CL_TRUE, CL_MAP_READ, 0, size_bytes);
     // cout<<"Finished mapping the buffers to the user space pointers"<<endl;
 
     et.add("Filling data in the user space pointers");
@@ -120,25 +121,27 @@ int main(int argc,char **argv){
     OCL_CHECK(err, q.enqueueMigrateMemObjects(inBuf, 0,NULL,&event_sp));
     clWaitForEvents(1, (const cl_event *)&event_sp);
     // cout << "Finished migrating the memories from the host side to the device" << endl;
+    et.finish();
 
-    et.add("Launching the Kernel");
     q.enqueueTask(kernel, NULL, &event_sp);
+    et.add("Launching the Kernel");
     clWaitForEvents(1, (const cl_event *)&event_sp);
     // cout << "Finished the kernel execution" << endl;
 
-    et.add("Mapping the output buffer into the host pointer")
+    et.add("Mapping the output buffer into the host pointer");
     // outBuf.push_back(hw_buf);
     // q.enqueueMigrateMemObjects(outBuf, CL_MIGRATE_MEM_OBJECT_HOST, NULL, &event_sp);
     // clWaitForEvents(1, (const cl_event *)&event_sp);
     // cout << "Fetched the results from the device to the host" << endl;
 
     float *hw = (float *)q.enqueueMapBuffer(hw_buf, CL_TRUE, CL_MAP_READ, 0, size_bytes);
+    et.finish();
 
     bool verified = true;
     for (unsigned int i = 0; i < num_elements;i++){
-        cout << i << " : " << a[i] << " * " << b[i] << " = " << sw[i] << " | " << hw[i] << endl;
         if (sw[i] != hw[i])
         {
+            cout << i << " : " << a[i] << " * " << b[i] << " = " << sw[i] << " | " << hw[i] << endl;
             cout << "Results dont match" << endl;
             break;
             verified = false;
@@ -151,7 +154,8 @@ int main(int argc,char **argv){
     q.enqueueUnmapMemObject(sw_buf, sw);
     q.enqueueUnmapMemObject(hw_buf, hw);
     q.finish(); // Add this to avoid getting segmentation fault
-    
+    et.finish();
+
     et.print();
     
     return (verified == true) ? EXIT_SUCCESS : EXIT_FAILURE;
