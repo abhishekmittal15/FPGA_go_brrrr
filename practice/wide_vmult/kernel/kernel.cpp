@@ -81,7 +81,7 @@ const unsigned int c_size = VECTOR_SIZE;
    */
 extern "C"
 {
-    void wide_vadd(
+    void wide_krnl(
         const uint512_dt *in1, // Read-Only Vector 1
         const uint512_dt *in2, // Read-Only Vector 2
         uint512_dt *out,       // Output Result

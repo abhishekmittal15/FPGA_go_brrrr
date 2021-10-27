@@ -27,7 +27,9 @@ opencl_LDFLAGS=-L$(OPENCL_LIB) -lOpenCL -pthread
 
 ###### Setting Host variables ######
 cxx := g++
-cxx_flags := $(opencl_CXXFLAGS) -Wall -O3 -g -std=c++11 -fmessage-length=0
+cxx_flags := $(opencl_CXXFLAGS) -Wall -O3 -g -std=c++11 -fmessage-length=0 
+openmpflag := -fopenmp
+cxx_flags += $(openmpflag)
 cxx_flags += -I$(include_folder)
 ld_flags := $(opencl_LDFLAGS) 
 ld_flags += -lrt -lstdc++ -lxilinxopencl -lpthread
@@ -73,7 +75,7 @@ ifneq ($(TARGET),hw)
 	@echo 
 	@echo 
 	@echo RUNTIME RESULTS
-	XCL_EMULATION_MODE=$(TARGET) ./host_exe $(NUM_ELEMENTS) $(build_folder)/kernel.xclbin 
+	XCL_EMULATION_MODE=$(TARGET) ./host_exe $(build_folder)/kernel.xclbin 
 else
 	./host 
 endif
@@ -125,4 +127,5 @@ clean:
 cleanall: clean
 	-$(RMDIR) build_dir* sd_card*
 	-$(RMDIR) package.*
+	-$(RMDIR) .run
 	-$(RMDIR) _x* *xclbin.run_summary qemu-memory-_* emulation _vimage pl* start_simulation.sh *.xclbin

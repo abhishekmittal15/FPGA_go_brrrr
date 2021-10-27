@@ -35,6 +35,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #include <vector>
 #include <iomanip>
+#include <omp.h>
 
 // This extension file is required for stream APIs
 #include "CL/cl_ext_xilinx.h"
@@ -54,6 +55,7 @@ void vectors_init(int *buffer_a, int *buffer_b, int *sw_results, unsigned int nu
 }
 
 void host_side_comp(int *buffer_a,int *buffer_b,int *sw_results,unsigned int num_elements){
+#pragma omp parallel for
     for (unsigned int i = 0; i < num_elements;i++){
         sw_results[i] = buffer_a[i] + buffer_b[i];
     }
@@ -76,18 +78,10 @@ bool verify(int *buffer_a,int *buffer_b,int *sw_results, int *hw_results, int nu
     return match;
 }
 
-int main(int argc, char **argv)
-{
+int repeat(char *filename,int num_elements){
     EventTimer et;
 
-    // Check input arguments
-    if(argc!=3){
-        std::cout << "Insufficient Arguments" << std::endl;
-        return EXIT_FAILURE;
-    }
     // Read FPGA binary file
-    char * binaryFile = argv[2];
-    unsigned int num_elements = std::stoi(argv[1]);
     unsigned int size_bytes = num_elements * sizeof(int);
 
     // OpenCL Host Code Begins.
@@ -106,7 +100,7 @@ int main(int argc, char **argv)
     std::vector<cl::Device> devices = xcl::get_xil_devices();
     // read_binary_file() is a utility API which will load the binaryFile
     // and will return the pointer to file buffer.
-    auto fileBuf = xcl::read_binary_file(binaryFile);
+    auto fileBuf = xcl::read_binary_file(filename);
     cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
     bool valid_device = false;
     for (unsigned int i = 0; i < devices.size(); i++)
@@ -158,29 +152,29 @@ int main(int argc, char **argv)
                      NULL,
                      NULL);
     cl::Buffer hw_buf(context,
-                     static_cast<cl_mem_flags>(CL_MEM_WRITE_ONLY | CL_MEM_ALLOC_HOST_PTR),
-                     size_bytes,
-                     NULL,
-                     NULL);
+                      static_cast<cl_mem_flags>(CL_MEM_WRITE_ONLY | CL_MEM_ALLOC_HOST_PTR),
+                      size_bytes,
+                      NULL,
+                      NULL);
     cl::Buffer sw_buf(context,
-                     static_cast<cl_mem_flags>(CL_MEM_READ_WRITE |
-                                               CL_MEM_ALLOC_HOST_PTR),
-                     size_bytes,
-                     NULL,
-                     NULL);
+                      static_cast<cl_mem_flags>(CL_MEM_READ_WRITE |
+                                                CL_MEM_ALLOC_HOST_PTR),
+                      size_bytes,
+                      NULL,
+                      NULL);
     et.finish();
 
     et.add("Map buffers to user space pointers");
     int *a = (int *)q.enqueueMapBuffer(a_buf,
-                                        CL_TRUE,
-                                        CL_MAP_WRITE,
-                                        0,
-                                        size_bytes);
+                                       CL_TRUE,
+                                       CL_MAP_WRITE,
+                                       0,
+                                       size_bytes);
     int *b = (int *)q.enqueueMapBuffer(b_buf,
-                                        CL_TRUE,
-                                        CL_MAP_WRITE,
-                                        0,
-                                        size_bytes);
+                                       CL_TRUE,
+                                       CL_MAP_WRITE,
+                                       0,
+                                       size_bytes);
     int *sw = (int *)q.enqueueMapBuffer(sw_buf,
                                         CL_TRUE,
                                         CL_MAP_WRITE | CL_MAP_READ,
@@ -202,13 +196,15 @@ int main(int argc, char **argv)
     // Device-to-host communication
 
     // Setting Kernel Arguments krnl_vadd
-    OCL_CHECK(err, err = krnl_vadd.setArg(0, a_buf));
-    OCL_CHECK(err, err = krnl_vadd.setArg(1, b_buf));
-    OCL_CHECK(err, err = krnl_vadd.setArg(2, hw_buf));
-    OCL_CHECK(err, err = krnl_vadd.setArg(3, num_elements));
+    OCL_CHECK(err, err = kernel.setArg(0, a_buf));
+    OCL_CHECK(err, err = kernel.setArg(1, b_buf));
+    OCL_CHECK(err, err = kernel.setArg(2, hw_buf));
+    OCL_CHECK(err, err = kernel.setArg(3, num_elements));
 
     // Copy input data to device global memory
+    et.add("Migration from host to device took");
     OCL_CHECK(err, err = q.enqueueMigrateMemObjects({a_buf, b_buf}, 0 /* 0 means from host*/));
+    et.finish();
     OCL_CHECK(err, err = q.finish());
 
     // Launching the Kernels
@@ -227,11 +223,36 @@ int main(int argc, char **argv)
         0,
         size_bytes);
     et.finish();
-    
+
+    et.add("Unmapping the buffers and the host pointers");
+    q.enqueueUnmapMemObject(a_buf, a);
+    q.enqueueUnmapMemObject(b_buf, b);
+    q.enqueueUnmapMemObject(sw_buf, sw);
+    q.enqueueUnmapMemObject(hw_buf, hw);
+    et.finish();
+
     OCL_CHECK(err, err = q.finish());
 
     // Compare the device results with software results
-    bool match = verify(sw_results.data(), hw_results.data(), num_elements);
+    bool match = verify(a, b, sw, hw, num_elements);
+
+    et.print();
 
     return (match ? EXIT_SUCCESS : EXIT_FAILURE);
+}
+
+int main(int argc, char **argv)
+{
+    int n=(int)(1e5);
+    char *filename = argv[1];
+    if (argc != 2)
+    {
+        std::cout<<"please pass the xclbin file name also"<<std::endl;
+        return EXIT_FAILURE;
+    }
+    for(int i=0;i<10;i++){
+        std::cout << "Running for " << n << " elements" << std::endl;
+        repeat(filename, n);
+        n += (int)(1e5);
+    }
 }
