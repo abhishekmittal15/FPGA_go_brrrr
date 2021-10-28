@@ -33,7 +33,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <chrono>
 #include <string>
-#include <fstream>
 #include <vector>
 
 class EventTimer
@@ -52,13 +51,13 @@ private:
     float ms_difference(EventTimer::timepoint start, EventTimer::timepoint end);
 
 public:
+    std::vector<float> times;
     EventTimer(void);
     int add(std::string description);
     void finish(void);
     void clear(void);
 
     void print(int id = -1);
-    void write();
 };
 
 #endif // EVENT_TIMER_HPP__

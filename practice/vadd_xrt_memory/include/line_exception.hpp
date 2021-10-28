@@ -27,38 +27,55 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **********/
 
+#ifndef LINE_EXCEPTION__
+#define LINE_EXCEPTION__
 
-#ifndef EVENT_TIMER_HPP__
-#define EVENT_TIMER_HPP__
-
-#include <chrono>
+#include <cerrno>
+#include <cstring>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
 #include <string>
-#include <fstream>
-#include <vector>
 
-class EventTimer
+class LineException : public std::runtime_error
 {
-    typedef std::chrono::high_resolution_clock::time_point timepoint;
-
-private:
-    std::vector<EventTimer::timepoint> start_times;
-    std::vector<EventTimer::timepoint> end_times;
-    std::vector<std::string> event_names;
-
-    bool unfinished;
-    unsigned int event_count;
-    int max_string_length;
-
-    float ms_difference(EventTimer::timepoint start, EventTimer::timepoint end);
+    std::string message;
+    int exception_errno;
 
 public:
-    EventTimer(void);
-    int add(std::string description);
-    void finish(void);
-    void clear(void);
+    LineException(const std::string &arg, int errno_in, const char *file, int line) : std::runtime_error(arg)
+    {
+        std::ostringstream output;
+        const char *filename = NULL;
+        filename             = strrchr(file, '/');
 
-    void print(int id = -1);
-    void write();
+        output << "(";
+        if (filename) {
+            output << (filename + 1);
+        }
+        else {
+            output << file;
+        }
+        output << ":" << line << ") " << arg;
+        if (errno != 0) {
+            output << std::endl
+                   << "   (" << std::strerror(errno) << ")" << std::endl;
+        }
+        message         = output.str();
+        exception_errno = errno_in;
+    }
+    ~LineException() throw() {}
+    const char *what() const throw()
+    {
+        return message.c_str();
+    }
+    const int le_errno()
+    {
+        return exception_errno;
+    }
 };
 
-#endif // EVENT_TIMER_HPP__
+#define throw_lineexception(arg) throw LineException(arg, 0, __FILE__, __LINE__);
+#define throw_lineexception_errno(arg, errno_in) throw LineException(arg, errno_in, __FILE__, __LINE__);
+
+#endif
