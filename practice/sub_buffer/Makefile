@@ -1,8 +1,9 @@
 TARGET := sw_emu
 NUM_ELEMENTS := 4096
+NUM_BUFS := 10
 KERNEL_NAME := krnl_vadd
 device := $(AWS_PLATFORM)
-host_files := ./host/host.cpp ./host/xcl2.cpp
+host_files := ./host/host.cpp ./host/xcl2.cpp ./host/event_timer.cpp ./host/xilinx_ocl_helper.cpp
 kernel_file := ./kernel/kernel.cpp
 include_folder := ./include
 TEMP_DIR := temp_dir
@@ -29,6 +30,7 @@ opencl_LDFLAGS=-L$(OPENCL_LIB) -lOpenCL -pthread
 cxx := g++
 cxx_flags := $(opencl_CXXFLAGS) -Wall -O3 -g -std=c++11 -fmessage-length=0
 cxx_flags += -I$(include_folder)
+cxx_flags += -fopenmp
 ld_flags := $(opencl_LDFLAGS) 
 ld_flags += -lrt -lstdc++ -lxilinxopencl -lpthread
 ####################################
@@ -73,7 +75,7 @@ ifneq ($(TARGET),hw)
 	@echo 
 	@echo 
 	@echo RUNTIME RESULTS
-	XCL_EMULATION_MODE=$(TARGET) ./host_exe $(NUM_ELEMENTS) $(build_folder)/kernel.xclbin 
+	XCL_EMULATION_MODE=$(TARGET) ./host_exe $(NUM_ELEMENTS) $(NUM_BUFS) $(build_folder)/kernel.xclbin 
 else
 	./host 
 endif
@@ -124,5 +126,6 @@ clean:
 
 cleanall: clean
 	-$(RMDIR) build_dir* sd_card*
-	-$(RMDIR) package.*
+	-$(RMDIR) package.* 
+	-$(RMDIR) ./run/*
 	-$(RMDIR) _x* *xclbin.run_summary qemu-memory-_* emulation _vimage pl* start_simulation.sh *.xclbin
