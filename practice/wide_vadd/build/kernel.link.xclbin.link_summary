@@ -1,0 +1,578 @@
+<ENTRY>
+{
+ "thisFile": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/build/kernel.link.xclbin.link_summary",
+ "connectId": "",
+ "serverToken": "",
+ "timestamp": "0"
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_CmdStep",
+ "dateTimestamp": "Wed Oct 27 08:29:45 2021",
+ "timestampMillis": "1635323385572",
+ "buildStep": {
+  "cmdId": "1064cb1f-1cfd-457a-a339-b75b0e3af93d",
+  "name": "v++",
+  "logFile": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/link.steps.log",
+  "commandLine": "/tools/Xilinx/Vitis/2021.1/bin/unwrapped/lnx64.o/v++ --xp param:compiler.lockFlowCritSlackThreshold=0 --xp vivado_param:hd.routingContainmentAreaExpansion=true --xp vivado_param:hd.supportClockNetCrossDiffReconfigurablePartitions=1 --xp vivado_param:bitstream.enablePR=4123 --xp vivado_param:physynth.ultraRAMOptOutput=false --xp vivado_prop:run.__KERNEL__.{STEPS.SYNTH_DESIGN.ARGS.MAX_URAM_CASCADE_HEIGHT}={1} --xp vivado_param:synth.elaboration.rodinMoreOptions={rt::set_parameter disableOregPackingUram true}  --vivado.prop \"run.__KERNEL__.{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}={-directive sdx_optimization_effort_high}\" --advanced.misc \"report=type report_timing_summary name impl_report_timing_summary_route_design_summary steps {route_design} runs {impl_1} options {-max_paths 10}\" --advanced.misc \"report=type report_timing_summary name impl_report_timing_summary_post_route_phys_opt_design_summary steps {post_route_phys_opt_design} runs {impl_1} options {-max_paths 10}\" --target sw_emu --platform /home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2/xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm --save-temps -g --temp_dir temp_dir --config design.cfg -l -o./build/kernel.link.xclbin kernel.xo ",
+  "args": [
+   "--xp",
+   "param:compiler.lockFlowCritSlackThreshold=0",
+   "--xp",
+   "vivado_param:hd.routingContainmentAreaExpansion=true",
+   "--xp",
+   "vivado_param:hd.supportClockNetCrossDiffReconfigurablePartitions=1",
+   "--xp",
+   "vivado_param:bitstream.enablePR=4123",
+   "--xp",
+   "vivado_param:physynth.ultraRAMOptOutput=false",
+   "--xp",
+   "vivado_prop:run.__KERNEL__.{STEPS.SYNTH_DESIGN.ARGS.MAX_URAM_CASCADE_HEIGHT}={1}",
+   "--xp",
+   "vivado_param:synth.elaboration.rodinMoreOptions={rt::set_parameter disableOregPackingUram true}",
+   "--target",
+   "sw_emu",
+   "--platform",
+   "/home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2/xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm",
+   "--save-temps",
+   "-g",
+   "--temp_dir",
+   "temp_dir",
+   "--config",
+   "design.cfg",
+   "-l",
+   "-o./build/kernel.link.xclbin",
+   "kernel.xo"
+  ],
+  "iniFiles": [
+   {
+    "path": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/design.cfg",
+    "content": "debug=1 \nprofile_kernel=data:wide_krnl:all:all\n\n[connectivity]\nnk=wide_krnl:1:wide_krnl\n"
+   }
+  ],
+  "cwd": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Oct 27 08:29:45 2021",
+ "timestampMillis": "1635323385572",
+ "status": {
+  "cmdId": "1064cb1f-1cfd-457a-a339-b75b0e3af93d",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_FlowMetaData",
+ "dateTimestamp": "Wed Oct 27 08:29:52 2021",
+ "timestampMillis": "1635323392097",
+ "buildSummary": {
+  "hardwarePlatform": "xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm",
+  "hardwareDsa": "xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xsa",
+  "platformDirectory": "/home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2",
+  "runtime": "OpenCL",
+  "systemConfig": "Linux",
+  "flow": "BF_LINK",
+  "target": "TT_SW_EMU",
+  "binaryContainer": {
+   "base": {
+    "type": "BT_UKNOWN",
+    "name": "kernel.link",
+    "file": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/build/kernel.link.xclbin",
+    "reports": [],
+    "uuid": ""
+   },
+   "kernels": []
+  },
+  "kernels": [
+   {
+    "base": {
+     "type": "KERNEL",
+     "name": "wide_krnl",
+     "file": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/kernel.xo",
+     "reports": [],
+     "uuid": ""
+    },
+    "sources": [
+     "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/xo/wide_krnl/wide_krnl/cpu_sources/kernel.cpp"
+    ],
+    "psSources": [],
+    "cuNames": [
+     "wide_krnl"
+    ],
+    "type": "HLS",
+    "frequency": 0,
+    "freqUnits": ""
+   }
+  ],
+  "toolVersion": "Vitis V++ Compiler Release 2021.1. SW Build 3246112 on 2021-06-09-14:19:56"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Wed Oct 27 08:29:52 2021",
+ "timestampMillis": "1635323392101",
+ "buildStep": {
+  "cmdId": "e5b67526-ac25-4309-90e9-80fc1f23d96f",
+  "name": "regiongen",
+  "logFile": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link_regiongen.log",
+  "commandLine": "/tools/Xilinx/Vitis/2021.1/bin/../runtime/bin/regiongen_new -v -m /home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link.xml -t alg -o xcl_top",
+  "args": [
+   "-v",
+   "-m",
+   "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link.xml",
+   "-t",
+   "alg",
+   "-o",
+   "xcl_top"
+  ],
+  "iniFiles": [],
+  "cwd": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Oct 27 08:29:52 2021",
+ "timestampMillis": "1635323392101",
+ "status": {
+  "cmdId": "e5b67526-ac25-4309-90e9-80fc1f23d96f",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Oct 27 08:29:53 2021",
+ "timestampMillis": "1635323393708",
+ "status": {
+  "cmdId": "e5b67526-ac25-4309-90e9-80fc1f23d96f",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Wed Oct 27 08:29:53 2021",
+ "timestampMillis": "1635323393710",
+ "buildStep": {
+  "cmdId": "0a5db0d3-2ab6-4bf3-af8f-297aab9d79bb",
+  "name": "gcc",
+  "logFile": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/wide_krnl/wide_krnl_kernel_gcc.log",
+  "commandLine": "/tools/Xilinx/Vivado/2021.1/tps/lnx64/gcc-6.2.0/bin/gcc -I . -I /tools/Xilinx/Vitis_HLS/2021.1/bin/../include -I /tools/Xilinx/Vitis_HLS/2021.1/bin/../lnx64/tools/auto_cc/include -I /tools/Xilinx/Vitis_HLS/2021.1/bin/../common/technology/autopilot/opencl -I /tools/Xilinx/Vitis/2021.1/bin/../common/technology/autopilot/opencl -std=c++14 -g -I /home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/include -g -fPIC -g -c -DHLS_STREAM_THREAD_SAFE -MD -MT obj/kernel.o -MP -MF obj/kernel.Cd /home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/xo/wide_krnl/wide_krnl/cpu_sources/kernel.cpp -o obj/kernel.o",
+  "args": [
+   "-I",
+   ".",
+   "-I",
+   "/tools/Xilinx/Vitis_HLS/2021.1/bin/../include",
+   "-I",
+   "/tools/Xilinx/Vitis_HLS/2021.1/bin/../lnx64/tools/auto_cc/include",
+   "-I",
+   "/tools/Xilinx/Vitis_HLS/2021.1/bin/../common/technology/autopilot/opencl",
+   "-I",
+   "/tools/Xilinx/Vitis/2021.1/bin/../common/technology/autopilot/opencl",
+   "-std=c++14",
+   "-g",
+   "-I",
+   "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/include",
+   "-g",
+   "-fPIC",
+   "-g",
+   "-c",
+   "-DHLS_STREAM_THREAD_SAFE",
+   "-MD",
+   "-MT",
+   "obj/kernel.o",
+   "-MP",
+   "-MF",
+   "obj/kernel.Cd",
+   "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/xo/wide_krnl/wide_krnl/cpu_sources/kernel.cpp",
+   "-o",
+   "obj/kernel.o"
+  ],
+  "iniFiles": [],
+  "cwd": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Oct 27 08:29:53 2021",
+ "timestampMillis": "1635323393710",
+ "status": {
+  "cmdId": "0a5db0d3-2ab6-4bf3-af8f-297aab9d79bb",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Oct 27 08:29:53 2021",
+ "timestampMillis": "1635323393877",
+ "status": {
+  "cmdId": "0a5db0d3-2ab6-4bf3-af8f-297aab9d79bb",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Wed Oct 27 08:29:53 2021",
+ "timestampMillis": "1635323393877",
+ "buildStep": {
+  "cmdId": "a8a3bf0c-8ee5-46d1-b132-b7889b579ec0",
+  "name": "ar",
+  "logFile": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/wide_krnl/wide_krnl_ar.log",
+  "commandLine": "/tools/Xilinx/Vivado/2021.1/tps/lnx64/binutils-2.26/bin/ar -cr /home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/wide_krnl/wide_krnl.csim_cu.a /home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/wide_krnl/obj/kernel.o",
+  "args": [
+   "-cr",
+   "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/wide_krnl/wide_krnl.csim_cu.a",
+   "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/wide_krnl/obj/kernel.o"
+  ],
+  "iniFiles": [],
+  "cwd": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Oct 27 08:29:53 2021",
+ "timestampMillis": "1635323393877",
+ "status": {
+  "cmdId": "a8a3bf0c-8ee5-46d1-b132-b7889b579ec0",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Oct 27 08:29:53 2021",
+ "timestampMillis": "1635323393882",
+ "status": {
+  "cmdId": "a8a3bf0c-8ee5-46d1-b132-b7889b579ec0",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Wed Oct 27 08:29:53 2021",
+ "timestampMillis": "1635323393882",
+ "buildStep": {
+  "cmdId": "6cf98f07-be6b-4546-a7f0-6e9c45016880",
+  "name": "g++",
+  "logFile": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link_xcl_top_gpp.log",
+  "commandLine": "/tools/Xilinx/Vivado/2021.1/tps/lnx64/gcc-6.2.0/bin/g++ -I . -I /tools/Xilinx/Vitis_HLS/2021.1/bin/../include -I /tools/Xilinx/Vitis_HLS/2021.1/bin/../common/technology/autopilot/opencl -I /tools/Xilinx/Vitis/2021.1/bin/../common/technology/autopilot/opencl -I /tools/Xilinx/Vitis/2021.1/bin/../data/emulation/include -I /tools/Xilinx/Vitis_HLS/2021.1/bin/../lnx64/tools/auto_cc/include -fPIC -g -DHLS_STREAM_THREAD_SAFE -std=c++14 -fpermissive -c -MD -MT obj/xcl_top.o -MP -MF obj/xcl_top.CXXd xcl_top.cpp -o obj/xcl_top.o",
+  "args": [
+   "-I",
+   ".",
+   "-I",
+   "/tools/Xilinx/Vitis_HLS/2021.1/bin/../include",
+   "-I",
+   "/tools/Xilinx/Vitis_HLS/2021.1/bin/../common/technology/autopilot/opencl",
+   "-I",
+   "/tools/Xilinx/Vitis/2021.1/bin/../common/technology/autopilot/opencl",
+   "-I",
+   "/tools/Xilinx/Vitis/2021.1/bin/../data/emulation/include",
+   "-I",
+   "/tools/Xilinx/Vitis_HLS/2021.1/bin/../lnx64/tools/auto_cc/include",
+   "-fPIC",
+   "-g",
+   "-DHLS_STREAM_THREAD_SAFE",
+   "-std=c++14",
+   "-fpermissive",
+   "-c",
+   "-MD",
+   "-MT",
+   "obj/xcl_top.o",
+   "-MP",
+   "-MF",
+   "obj/xcl_top.CXXd",
+   "xcl_top.cpp",
+   "-o",
+   "obj/xcl_top.o"
+  ],
+  "iniFiles": [],
+  "cwd": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Oct 27 08:29:53 2021",
+ "timestampMillis": "1635323393883",
+ "status": {
+  "cmdId": "6cf98f07-be6b-4546-a7f0-6e9c45016880",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Oct 27 08:29:55 2021",
+ "timestampMillis": "1635323395045",
+ "status": {
+  "cmdId": "6cf98f07-be6b-4546-a7f0-6e9c45016880",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Wed Oct 27 08:29:55 2021",
+ "timestampMillis": "1635323395046",
+ "buildStep": {
+  "cmdId": "3399d971-1af6-44bb-95d5-c822b6ffe8b6",
+  "name": "g++",
+  "logFile": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link_top_gpp.log",
+  "commandLine": "/tools/Xilinx/Vivado/2021.1/tps/lnx64/gcc-6.2.0/bin/g++ -fPIC -DHLS_STREAM_THREAD_SAFE -std=c++14 -Wall -shared -Wl,--whole-archive,-soname,kernel.link.so -o kernel.link.so wide_krnl/wide_krnl.csim_cu.a obj/xcl_top.o -Wl,--no-whole-archive -Wl,--as-needed -L /tools/Xilinx/Vitis_HLS/2021.1/bin/../lib/lnx64.o -lhlsmathsim -L /tools/Xilinx/Vitis_HLS/2021.1/bin/../lnx64/tools/fpo_v7_0 -lgmp -lmpfr -lIp_floating_point_v7_0_bitacc_cmodel -Wl,-rpath,/tools/Xilinx/Vitis_HLS/2021.1/bin/../lnx64/tools/fpo_v7_0 -L /tools/Xilinx/Vitis_HLS/2021.1/bin/../lnx64/tools/fft_v9_1 -lIp_xfft_v9_1_bitacc_cmodel -L /tools/Xilinx/Vitis_HLS/2021.1/bin/../lnx64/tools/fir_v7_0 -lgmp -lIp_fir_compiler_v7_2_bitacc_cmodel -L /tools/Xilinx/Vitis_HLS/2021.1/bin/../lnx64/lib/csim -lhlsmc++-GCC46 -L /tools/Xilinx/Vivado/2021.1/tps/lnx64/gcc-6.2.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.2.0/ -lgcov",
+  "args": [
+   "-fPIC",
+   "-DHLS_STREAM_THREAD_SAFE",
+   "-std=c++14",
+   "-Wall",
+   "-shared",
+   "-Wl,--whole-archive,-soname,kernel.link.so",
+   "-o",
+   "kernel.link.so",
+   "wide_krnl/wide_krnl.csim_cu.a",
+   "obj/xcl_top.o",
+   "-Wl,--no-whole-archive",
+   "-Wl,--as-needed",
+   "-L",
+   "/tools/Xilinx/Vitis_HLS/2021.1/bin/../lib/lnx64.o",
+   "-lhlsmathsim",
+   "-L",
+   "/tools/Xilinx/Vitis_HLS/2021.1/bin/../lnx64/tools/fpo_v7_0",
+   "-lgmp",
+   "-lmpfr",
+   "-lIp_floating_point_v7_0_bitacc_cmodel",
+   "-Wl,-rpath,/tools/Xilinx/Vitis_HLS/2021.1/bin/../lnx64/tools/fpo_v7_0",
+   "-L",
+   "/tools/Xilinx/Vitis_HLS/2021.1/bin/../lnx64/tools/fft_v9_1",
+   "-lIp_xfft_v9_1_bitacc_cmodel",
+   "-L",
+   "/tools/Xilinx/Vitis_HLS/2021.1/bin/../lnx64/tools/fir_v7_0",
+   "-lgmp",
+   "-lIp_fir_compiler_v7_2_bitacc_cmodel",
+   "-L",
+   "/tools/Xilinx/Vitis_HLS/2021.1/bin/../lnx64/lib/csim",
+   "-lhlsmc++-GCC46",
+   "-L",
+   "/tools/Xilinx/Vivado/2021.1/tps/lnx64/gcc-6.2.0/bin/../lib/gcc/x86_64-pc-linux-gnu/6.2.0/",
+   "-lgcov"
+  ],
+  "iniFiles": [],
+  "cwd": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Oct 27 08:29:55 2021",
+ "timestampMillis": "1635323395046",
+ "status": {
+  "cmdId": "3399d971-1af6-44bb-95d5-c822b6ffe8b6",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Oct 27 08:29:55 2021",
+ "timestampMillis": "1635323395127",
+ "status": {
+  "cmdId": "3399d971-1af6-44bb-95d5-c822b6ffe8b6",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Wed Oct 27 08:29:55 2021",
+ "timestampMillis": "1635323395267",
+ "report": {
+  "path": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link_xml.rtd",
+  "name": "",
+  "fileType": "JSON",
+  "reportType": "XCLBIN_INFO",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Wed Oct 27 08:29:55 2021",
+ "timestampMillis": "1635323395268",
+ "buildStep": {
+  "cmdId": "04366f9f-7aa1-447e-9753-c5f56aa152ad",
+  "name": "xclbinutil",
+  "logFile": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link_xclbinutil.log",
+  "commandLine": "/tools/Xilinx/Vitis/2021.1/bin/xclbinutil --add-section BITSTREAM:RAW:/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link.so --force --target sw_emu --add-section :JSON:/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link.rtd --append-section :JSON:/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/appendSection.rtd --add-section CLOCK_FREQ_TOPOLOGY:JSON:/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link_xml.rtd --add-section BUILD_METADATA:JSON:/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link_build.rtd --add-section EMBEDDED_METADATA:RAW:/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link.xml --add-section DEBUG_DATA:RAW:/dev/null --output /home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/./build/kernel.link.xclbin",
+  "args": [
+   "--add-section",
+   "BITSTREAM:RAW:/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link.so",
+   "--force",
+   "--target",
+   "sw_emu",
+   "--add-section",
+   ":JSON:/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link.rtd",
+   "--append-section",
+   ":JSON:/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/appendSection.rtd",
+   "--add-section",
+   "CLOCK_FREQ_TOPOLOGY:JSON:/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link_xml.rtd",
+   "--add-section",
+   "BUILD_METADATA:JSON:/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link_build.rtd",
+   "--add-section",
+   "EMBEDDED_METADATA:RAW:/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/link/int/kernel.link.xml",
+   "--add-section",
+   "DEBUG_DATA:RAW:/dev/null",
+   "--output",
+   "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/./build/kernel.link.xclbin"
+  ],
+  "iniFiles": [],
+  "cwd": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Oct 27 08:29:55 2021",
+ "timestampMillis": "1635323395269",
+ "status": {
+  "cmdId": "04366f9f-7aa1-447e-9753-c5f56aa152ad",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Oct 27 08:29:55 2021",
+ "timestampMillis": "1635323395334",
+ "status": {
+  "cmdId": "04366f9f-7aa1-447e-9753-c5f56aa152ad",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Wed Oct 27 08:29:55 2021",
+ "timestampMillis": "1635323395335",
+ "buildStep": {
+  "cmdId": "91be363a-7c5f-4867-adac-c0c6863f616e",
+  "name": "xclbinutil",
+  "logFile": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/build/kernel.link.xclbin.info",
+  "commandLine": "/tools/Xilinx/Vitis/2021.1/bin/xclbinutil --quiet --info --input /home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/./build/kernel.link.xclbin",
+  "args": [
+   "--quiet",
+   "--info",
+   "--input",
+   "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/./build/kernel.link.xclbin"
+  ],
+  "iniFiles": [],
+  "cwd": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Oct 27 08:29:55 2021",
+ "timestampMillis": "1635323395335",
+ "status": {
+  "cmdId": "91be363a-7c5f-4867-adac-c0c6863f616e",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Oct 27 08:29:55 2021",
+ "timestampMillis": "1635323395399",
+ "status": {
+  "cmdId": "91be363a-7c5f-4867-adac-c0c6863f616e",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Wed Oct 27 08:29:55 2021",
+ "timestampMillis": "1635323395453",
+ "report": {
+  "path": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/reports/link/v++_link_kernel.link_guidance.html",
+  "name": "",
+  "fileType": "HTML",
+  "reportType": "GLOBAL_RULECHECK_GUIDANCE",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Wed Oct 27 08:29:55 2021",
+ "timestampMillis": "1635323395453",
+ "report": {
+  "path": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/v++_link_kernel.link_guidance.pb",
+  "name": "",
+  "fileType": "BINARY_PROTOBUF",
+  "reportType": "GLOBAL_RULECHECK_GUIDANCE",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Wed Oct 27 08:29:55 2021",
+ "timestampMillis": "1635323395454",
+ "report": {
+  "path": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/temp_dir/logs/optraceViewer.html",
+  "name": "",
+  "fileType": "HTML",
+  "reportType": "OPERATION_TRACE",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Oct 27 08:29:55 2021",
+ "timestampMillis": "1635323395455",
+ "status": {
+  "cmdId": "1064cb1f-1cfd-457a-a339-b75b0e3af93d",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
