@@ -1,32 +1,3 @@
-/**********
-Copyright (c) 2019, Xilinx, Inc.
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification,
-are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice,
-this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice,
-this list of conditions and the following disclaimer in the documentation
-and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors
-may be used to endorse or promote products derived from this software
-without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**********/
-
 #include "event_timer.hpp"
 
 #include <array>
@@ -39,22 +10,31 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Xilinx OpenCL and XRT includes
 #include "xilinx_ocl_helper.hpp"
 
-// #define BUFSIZE (1024 * 1024 * 32)
-#define NUM_BUFS 1
+#define n (1024 * 1024 * 32)
+#define NUM_BUFS 110
 
-void init(uint32_t *a, uint32_t *b, uint32_t *c, uint32_t *d,unsigned int num_elements){
-    for (unsigned int i = 0; i < num_elements; i++){
-        a[i] = std::rand();
-        b[i] = std::rand();
-        c[i] = 0;
-        d[i] = 0;
+// void init(int *a, int *b, int *c, int *d,unsigned int num_elements){
+//     for (unsigned int i = 0; i < num_elements; i++){
+//         a[i] = std::rand()/100;
+//         b[i] = std::rand()/100;
+//         c[i] = 0;
+//         d[i] = 0;
+//     }
+// }
+
+void init(int *a, int *b, unsigned int num_elements)
+{
+    for (unsigned int i = 0; i < num_elements; i++)
+    {
+        a[i] = std::rand() / 100;
+        b[i] = std::rand() / 100;
     }
 }
 
-void vadd_sw(uint32_t *a, uint32_t *b, uint32_t *c, uint32_t size)
+void vadd_sw(int *a, int *b,int *c, unsigned int num_elements)
 {
-    #pragma omp parallel for
-    for (int i = 0; i < size; i++)
+    // #pragma omp parallel for
+    for (unsigned int i = 0; i < num_elements; i++)
     {
         c[i] = a[i] + b[i];
     }
@@ -142,7 +122,7 @@ int enqueue_subbuf_vadd(cl::CommandQueue &q,
     krnl.setArg(0, a);
     krnl.setArg(1, b);
     krnl.setArg(2, c);
-    krnl.setArg(3, (uint32_t)(size / sizeof(uint32_t)));
+    krnl.setArg(3, (int)(size / sizeof(int)));
 
     q.enqueueTask(krnl, &krnl_events, &k_event);
     krnl_events.push_back(k_event);
@@ -167,7 +147,7 @@ std::vector<float> f(char* filename,int num_elements){
     // const unsigned int NUM_BUFS = std::stoi(argv[1]);
     std::string file(filename);
 
-    std::cout << "-- Example 5: Pipelining Kernel Execution for "<<num_elements<<" elements --" << std::endl
+    std::cout << "-- Example 5: Pipelining Kernel Execution for "<<num_elements<<" elements -- and "<<NUM_BUFS<<" buffers " << std::endl
               << std::endl;
 
     // Initialize the runtime (including a command queue) and load the
@@ -197,20 +177,20 @@ std::vector<float> f(char* filename,int num_elements){
         et.add("Allocate contiguous OpenCL buffers");
         cl::Buffer a_buf(xocl.get_context(),
                          static_cast<cl_mem_flags>(CL_MEM_READ_ONLY),
-                         num_elements * sizeof(uint32_t),
+                         num_elements * sizeof(int),
                          NULL,
                          NULL);
         cl::Buffer b_buf(xocl.get_context(),
                          static_cast<cl_mem_flags>(CL_MEM_READ_ONLY),
-                         num_elements * sizeof(uint32_t),
+                         num_elements * sizeof(int),
                          NULL,
                          NULL);
         cl::Buffer c_buf(xocl.get_context(),
                          static_cast<cl_mem_flags>(CL_MEM_READ_WRITE),
-                         num_elements * sizeof(uint32_t),
+                         num_elements * sizeof(int),
                          NULL,
                          NULL);
-        uint32_t *d = new uint32_t[num_elements];
+        int *d = new int[num_elements];
         et.finish();
 
         // Although we'll change these later, we'll set the buffers as kernel
@@ -221,25 +201,25 @@ std::vector<float> f(char* filename,int num_elements){
         krnl.setArg(2, c_buf);
 
         et.add("Map buffers to userspace pointers");
-        uint32_t *a = (uint32_t *)q.enqueueMapBuffer(a_buf,
-                                                     CL_TRUE,
-                                                     CL_MAP_WRITE,
-                                                     0,
-                                                     num_elements * sizeof(uint32_t));
-        uint32_t *b = (uint32_t *)q.enqueueMapBuffer(b_buf,
-                                                     CL_TRUE,
-                                                     CL_MAP_WRITE,
-                                                     0,
-                                                     num_elements * sizeof(uint32_t));
-        uint32_t *c = (uint32_t *)q.enqueueMapBuffer(c_buf,
-                                                     CL_TRUE,
-                                                     CL_MAP_READ,
-                                                     0,
-                                                     num_elements * sizeof(uint32_t));
+        int *a = (int *)q.enqueueMapBuffer(a_buf,
+                                            CL_TRUE,
+                                            CL_MAP_WRITE,
+                                            0,
+                                            num_elements * sizeof(int));
+        int *b = (int *)q.enqueueMapBuffer(b_buf,
+                                            CL_TRUE,
+                                            CL_MAP_WRITE,
+                                            0,
+                                            num_elements * sizeof(int));
+        int *c = (int *)q.enqueueMapBuffer(c_buf,
+                                            CL_TRUE,
+                                            CL_MAP_READ,
+                                            0,
+                                            num_elements * sizeof(int));
         et.finish();
 
         et.add("Populating buffer inputs");
-        init(a,b,c,d,num_elements)
+        init(a, b, num_elements);
         et.finish();
 
         // For comparison, let's have the CPU calculate the result
@@ -255,15 +235,16 @@ std::vector<float> f(char* filename,int num_elements){
         std::vector<cl::Buffer> a_bufs, b_bufs, c_bufs;
         et.add("Subdividing the buffers");
         subdivide_buffer(a_bufs, a_buf, CL_MEM_READ_ONLY, NUM_BUFS);
-                                                                                                                                                               subdivide_buffer(b_bufs, b_buf, CL_MEM_READ_ONLY, NUM_BUFS);
+        subdivide_buffer(b_bufs, b_buf, CL_MEM_READ_ONLY, NUM_BUFS);
         subdivide_buffer(c_bufs, c_buf, CL_MEM_WRITE_ONLY, NUM_BUFS);
         et.finish();
 
-        // std::array<cl::Event, NUM_BUFS> kernel_events;
-        std::vector<cl::Event> kernel_events(NUM_BUFS);
+        std::array<cl::Event, NUM_BUFS> kernel_events;
+        // std::vector<cl::Event> kernel_events(NUM_BUFS);
 
         for (int i = 0; i < NUM_BUFS; i++)
         {
+            // std::cout << i << " th buffer is being sent" << std::endl;
             enqueue_subbuf_vadd(q, krnl, kernel_events[i], a_bufs[i], b_bufs[i], c_bufs[i]);
         }
 
@@ -279,9 +260,9 @@ std::vector<float> f(char* filename,int num_elements){
             if (c[i] != d[i])
             {
                 verified = false;
-                std::cout << "ERROR: software and hardware vadd do not match: "
+                std::cout<<" ERROR: software and hardware vadd do not match: "
                           << c[i] << "!=" << d[i] << " at position " << i << std::endl;
-                return EXIT_FAILURE;
+                exit(1);
             }
         }
 
@@ -308,12 +289,17 @@ std::vector<float> f(char* filename,int num_elements){
         free(d);
         q.finish();
 
+        // cl_int clStatus;
+        // clStatus = clReleaseKernel(krnl);
+        // clStatus = clReleaseProgram(program);
+        // clStatus = clReleaseCommandQueue(q);
+        // clStatus = clReleaseContext(xocl.get_context());
         et.print();
     }
     catch (cl::Error &e)
     {
         std::cout << "ERROR: " << e.what() << std::endl;
-        return EXIT_FAILURE;
+        exit(1);
     }
     return et.times;
 }
@@ -322,26 +308,29 @@ int main(int argc, char *argv[])
 {
 
     char *filename = argv[1];
-    unsigned int n=(int)(1e5);
-    unsigned int increment = n;
-    std::vector<std::vector<float>> times;
-    int num_loops = 10;
-    for (int i = 0; i < num_loops;i++){
-        std::vector<float> timestamps=f(filename,n);
-        times.push_back(timestamps);
-        n += increment;
-    }
-    cout << "[" << endl;
-    for (int i = 0; i < 10; i++)
-    {
-        cout << "[";
-        for (int j = 0; j < times[i].size(); j++)
-        {
-            cout << times[i][j] << ",";
-        }
-        cout << "]," << endl;
-    }
-    cout << "]" << endl;
+    // unsigned int n=std::stoi(argv[1]);
+    // unsigned int increment = n;
+    // std::vector<std::vector<float>> times;
+    // int num_loops = 1;
+    // for (int i = 0; i < num_loops;i++){
+    std::vector<float> timestamps=f(filename,n);
+    for(int i=0;i<timestamps.size();i++)
+        std::cout << timestamps[i] << ",";
+    std::cout << std::endl;
+    // times.push_back(timestamps);
+    // n += increment;
+    // }
+    // std::cout << "[" << std::endl;
+    // for (int i = 0; i < num_loops; i++)
+    // {
+    //     std::cout << "[";
+    //     for (int j = 0; j < times[i].size(); j++)
+    //     {
+    //         std::cout << times[i][j] << ",";
+    //     }
+    //     std::cout << "]," << std::endl;
+    // }
+    // std::cout << "]" << std::endl;
 
     return EXIT_SUCCESS;
 }

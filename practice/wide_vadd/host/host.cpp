@@ -105,15 +105,17 @@ int main(int argc, char **argv)
 
     char *filename = argv[1];
     std::vector<std::vector<float>> times;
-    unsigned int n = (int)(1e3);
-    for (unsigned int i = 0; i < 1; i++)
+    unsigned int n = (int)(1e5);
+    unsigned int increment = n;
+    int num_loops = 10;
+    for (unsigned int i = 0; i < num_loops; i++)
     {
         std::vector<float> time_n = f(filename, n);
         times.push_back(time_n);
-        n += (int)(1e5);
+        n += increment;
     }
     cout << "[" << endl;
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < num_loops; i++)
     {
         cout << "[";
         for (unsigned int j = 0; j < times[i].size(); j++)

@@ -15,148 +15,126 @@ void init(float *a,float *b,float *sw,float *hw,unsigned int num_elements){
     }
 }
 
-void host_side_comp(float* a,float* b,float* sw,unsigned int num_elements){
+void host(float* a,float* b,float* sw,unsigned int num_elements){
     for (unsigned int i = 0; i < num_elements;i++)
         sw[i] = a[i] * b[i];
 }
 
-int main(int argc,char **argv){
+bool verify(float *a,float* b,float* sw,float *hw,unsigned int num_elements){
+
+    for(unsigned int i=0;i<num_elements;i++){
+        if(sw[i]!=hw[i]){
+            cout << a[i] << " * " << b[i] << " = " << sw[i] << " \\ " << hw[i] << endl;
+            cout << "Results dont match" << endl;
+            exit(1);
+        }
+    }
+
+    return true;
+}
+
+std::vector<float> f(char *filename, unsigned int num_elements)
+{
 
     EventTimer et;
 
-    if(argc!=3){
-        cout<<"Insufficient Arguments"<<endl;
-        return EXIT_FAILURE;
-    }
-
-    unsigned int num_elements = std::stoi(argv[1]);
+    auto binaryFile = xcl::read_binary_file(filename);
     unsigned int size_bytes = num_elements * sizeof(float);
-    char *filename = argv[2];
-    auto BinaryFile = xcl::read_binary_file(filename);
-    cl::Program::Binaries bins{{BinaryFile.data(), BinaryFile.size()}};
-
-    et.add("OPENCL Initialisation started");
-
+    cl::Program::Binaries bins{{binaryFile.data(), binaryFile.size()}};
     cl::Device device;
     cl::Context context;
     cl::CommandQueue q;
-    cl::Kernel kernel;
     cl::Program program;
-    cl::Event event_sp;
+    cl::Kernel kernel;
+    cl::Event event;
     cl_int err;
 
-    bool valid_device = false;
-
+    et.add("Init");
     std::vector<cl::Device> devices = xcl::get_xil_devices();
-    for(unsigned int i=0;i<devices.size();i++){
-        device=devices[i];
-        OCL_CHECK(err,context=cl::Context(device,NULL,NULL,NULL,&err));
-        OCL_CHECK(err, q = cl::CommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &err));
-        cout << "Trying to program the device [" << i << "] : " << device.getInfo<CL_DEVICE_NAME>() << endl;
-        program = cl::Program(context, {device},bins, NULL, &err);
+    device = devices[0];
+    context = cl::Context(device, NULL, NULL, NULL, &err);
+    q = cl::CommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &err);
+    program = cl::Program(context, {device}, bins, NULL, &err);
+    kernel = cl::Kernel(program, "krnl", &err);
+    et.finish();
 
-        if(err!=CL_SUCCESS){
-            cout << "Unable to program the device[" << i << "] : " << device.getInfo<CL_DEVICE_NAME>() << endl;
-            return EXIT_FAILURE;
-        }
-        else{
-            cout<<"Successfully programmed the device ["<<i<<"] : "<<device.getInfo<CL_DEVICE_NAME>()<<endl;
-            cout << "Trying to create the Kernel" << endl;
-            OCL_CHECK(err, kernel = cl::Kernel(program, "wide_krnl", &err));
-            cout << "Successfully created the Kernel" << endl;
-            valid_device = true;
-            break;
-        }
-    }
-    if(valid_device==false){
-        cout << "No device was successfully programmed" << endl;
-        return EXIT_FAILURE;
-    }
+    et.add("BufAlloc");
+    cl::Buffer a_buf(context, static_cast<cl_mem_flags>(CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, &err);
+    cl::Buffer b_buf(context, static_cast<cl_mem_flags>(CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, &err);
+    cl::Buffer sw_buf(context, static_cast<cl_mem_flags>(CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, &err);
+    cl::Buffer hw_buf(context, static_cast<cl_mem_flags>(CL_MEM_WRITE_ONLY | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, &err);
+    et.finish();
 
-    // cout<<"OPENCL Initialisation ended"<<endl;
+    et.add("SetArg");
+    kernel.setArg(0, a_buf);
+    kernel.setArg(1, b_buf);
+    kernel.setArg(2, hw_buf);
+    kernel.setArg(3, num_elements);
+    et.finish();
 
-    et.add("Buffer creation started");
+    et.add("Map");
+    float *a = (float *)(q.enqueueMapBuffer(a_buf, CL_TRUE, CL_MAP_WRITE, 0, size_bytes));
+    float *b = (float *)(q.enqueueMapBuffer(b_buf, CL_TRUE, CL_MAP_WRITE, 0, size_bytes));
+    float *sw = (float *)(q.enqueueMapBuffer(sw_buf, CL_TRUE, CL_MAP_READ | CL_MAP_WRITE, 0, size_bytes));
+    float *hw = (float *)(q.enqueueMapBuffer(hw_buf, CL_TRUE, CL_MAP_READ, 0, size_bytes));
+    et.finish();
 
-    OCL_CHECK(err, cl::Buffer a_buf(context, static_cast<cl_mem_flags>(CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, &err));
-    OCL_CHECK(err, cl::Buffer b_buf(context, static_cast<cl_mem_flags>(CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, &err));
-    OCL_CHECK(err, cl::Buffer sw_buf(context, static_cast<cl_mem_flags>(CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, &err));
-    OCL_CHECK(err, cl::Buffer hw_buf(context, static_cast<cl_mem_flags>(CL_MEM_WRITE_ONLY | CL_MEM_ALLOC_HOST_PTR), size_bytes, NULL, &err));
-
-    // cout << "Buffers creation ended" << endl;
-
-    et.add("Setting the Kernel arguments");
-
-    unsigned int nargs = 0;
-    OCL_CHECK(err, kernel.setArg(nargs++, a_buf));
-    OCL_CHECK(err, kernel.setArg(nargs++, b_buf));
-    OCL_CHECK(err, kernel.setArg(nargs++, hw_buf));
-    OCL_CHECK(err, kernel.setArg(nargs++, num_elements));
-
-    // cout<<"Set the Kernel Arguments"<<endl;
-
-    et.add("Mapping the buffers to the user space pointer");
-
-    float *a = (float *)q.enqueueMapBuffer(a_buf, CL_TRUE, CL_MAP_WRITE, 0, size_bytes);
-    float *b = (float *)q.enqueueMapBuffer(b_buf, CL_TRUE, CL_MAP_WRITE, 0, size_bytes);
-    float *sw = (float *)q.enqueueMapBuffer(sw_buf,CL_TRUE,CL_MAP_WRITE | CL_MAP_READ,0,size_bytes);
-    float *hw = (float *)q.enqueueMapBuffer(hw_buf, CL_TRUE, CL_MAP_READ, 0, size_bytes);
-    // cout<<"Finished mapping the buffers to the user space pointers"<<endl;
-
-    et.add("Filling data in the user space pointers");
+    et.add("Populate");
     init(a, b, sw, hw, num_elements);
-    // float *temp = new float[num_elements];
-    // init(a, b, sw,temp, num_elements);
-    // cout << "Finished filling the data in the host memory" << endl;
-
-    et.add("Starting Host Side Computation");
-    host_side_comp(a, b, sw, num_elements);
-    // cout << "Finished host side computation" << endl;
-
-    std::vector<cl::Memory> inBuf, outBuf;
-
-    et.add("Migrating the memory objects from the host to the device");
-    inBuf.push_back(a_buf);
-    inBuf.push_back(b_buf);
-
-    OCL_CHECK(err, q.enqueueMigrateMemObjects(inBuf, 0,NULL,&event_sp));
-    clWaitForEvents(1, (const cl_event *)&event_sp);
-    // cout << "Finished migrating the memories from the host side to the device" << endl;
     et.finish();
 
-    q.enqueueTask(kernel, NULL, &event_sp);
-    et.add("Launching the Kernel");
-    clWaitForEvents(1, (const cl_event *)&event_sp);
-    // cout << "Finished the kernel execution" << endl;
-
-    et.add("Mapping the output buffer into the host pointer");
-    outBuf.push_back(hw_buf);
-    q.enqueueMigrateMemObjects(outBuf, CL_MIGRATE_MEM_OBJECT_HOST, NULL, &event_sp);
-    clWaitForEvents(1, (const cl_event *)&event_sp);
-    // cout << "Fetched the results from the device to the host" << endl;
-
-    // float *hw = (float *)q.enqueueMapBuffer(hw_buf, CL_TRUE, CL_MAP_READ, 0, size_bytes);
+    et.add("Host");
+    host(a, b, sw, num_elements);
     et.finish();
 
-    bool verified = true;
-    for (unsigned int i = 0; i < num_elements;i++){
-        if (sw[i] != hw[i])
-        {
-            cout << i << " : " << a[i] << " * " << b[i] << " = " << sw[i] << " | " << hw[i] << endl;
-            cout << "Results dont match" << endl;
-            break;
-            verified = false;
-        }
-    }
-
-    et.add("Unmapping or freeing all the buffers");
-    q.enqueueUnmapMemObject(a_buf, a);
-    q.enqueueUnmapMemObject(b_buf, b);
-    q.enqueueUnmapMemObject(sw_buf, sw);
-    q.enqueueUnmapMemObject(hw_buf, hw);
-    q.finish(); // Add this to avoid getting segmentation fault
+    q.enqueueMigrateMemObjects({a_buf, b_buf}, 0, NULL, &event);
+    et.add("H2f");
+    clWaitForEvents(1, (const cl_event *)&event);
     et.finish();
 
+    q.enqueueTask(kernel, NULL, &event);
+    et.add("Kernel");
+    clWaitForEvents(1, (const cl_event *)&event);
+    et.finish();
+
+    q.enqueueMigrateMemObjects({hw_buf}, CL_MIGRATE_MEM_OBJECT_HOST, NULL, &event);
+    et.add("F2h");
+    clWaitForEvents(1, (const cl_event *)&event);
+    et.finish();
+
+    bool verified=verify(a,b,sw,hw,num_elements);
+
+    cout << "----------------------------------------------" << endl;
+    cout << "For " << num_elements << " elements" << endl;
     et.print();
-    
-    return (verified == true) ? EXIT_SUCCESS : EXIT_FAILURE;
+    cout << "----------------------------------------------" << endl;
+
+    return et.times;
+}
+
+int main(int argc, char **argv)
+{
+
+    char *filename = argv[1];
+    std::vector<std::vector<float>> times;
+    unsigned int n = (int)(1e5);
+    unsigned int increment = n;
+    int num_loops = 10;
+    for (unsigned int i = 0; i < num_loops; i++)
+    {
+        std::vector<float> time_n = f(filename, n);
+        times.push_back(time_n);
+        n += increment;
+    }
+    cout << "[" << endl;
+    for (int i = 0; i < num_loops; i++)
+    {
+        cout << "[";
+        for (unsigned int j = 0; j < times[i].size(); j++)
+        {
+            cout << times[i][j] << ",";
+        }
+        cout << "]," << endl;
+    }
+    cout << "]" << endl;
 }

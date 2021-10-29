@@ -1,6 +1,6 @@
 <ENTRY>
 {
- "thisFile": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/build/kernel.xclbin.package_summary",
+ "thisFile": "/home/ec2-user/FPGA_go_brrrr/practice/vmult_xrt_memory/build/kernel.xclbin.package_summary",
  "connectId": "",
  "serverToken": "",
  "timestamp": "0"
@@ -9,12 +9,12 @@
 <ENTRY>
 {
  "type": "ET_CmdStep",
- "dateTimestamp": "Fri Oct 29 06:21:38 2021",
- "timestampMillis": "1635488498314",
+ "dateTimestamp": "Fri Oct 29 06:06:48 2021",
+ "timestampMillis": "1635487608078",
  "buildStep": {
-  "cmdId": "5b0aae1b-082e-4e3a-96bc-8d9145dbff00",
+  "cmdId": "0a816cb8-31f7-487d-befd-e7e6743cdb9a",
   "name": "v++",
-  "logFile": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/_x/package/package.steps.log",
+  "logFile": "/home/ec2-user/FPGA_go_brrrr/practice/vmult_xrt_memory/_x/package/package.steps.log",
   "commandLine": "/tools/Xilinx/Vitis/2021.1/bin/unwrapped/lnx64.o/v++  --vivado.prop \"run.__KERNEL__.{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}={-directive sdx_optimization_effort_high}\" --advanced.misc \"report=type report_timing_summary name impl_report_timing_summary_route_design_summary steps {route_design} runs {impl_1} options {-max_paths 10}\" --advanced.misc \"report=type report_timing_summary name impl_report_timing_summary_post_route_phys_opt_design_summary steps {post_route_phys_opt_design} runs {impl_1} options {-max_paths 10}\" -p ./build/kernel.link.xclbin -t sw_emu --platform /home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2/xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm --package.out_dir ./package.sw_emu -o ./build/kernel.xclbin ",
   "args": [
    "-p",
@@ -29,17 +29,17 @@
    "./build/kernel.xclbin"
   ],
   "iniFiles": [],
-  "cwd": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd"
+  "cwd": "/home/ec2-user/FPGA_go_brrrr/practice/vmult_xrt_memory"
  }
 }
 </ENTRY>
 <ENTRY>
 {
  "type": "ET_Status",
- "dateTimestamp": "Fri Oct 29 06:21:38 2021",
- "timestampMillis": "1635488498314",
+ "dateTimestamp": "Fri Oct 29 06:06:48 2021",
+ "timestampMillis": "1635487608078",
  "status": {
-  "cmdId": "5b0aae1b-082e-4e3a-96bc-8d9145dbff00",
+  "cmdId": "0a816cb8-31f7-487d-befd-e7e6743cdb9a",
   "state": "CS_RUNNING"
  }
 }
@@ -47,8 +47,8 @@
 <ENTRY>
 {
  "type": "ET_FlowMetaData",
- "dateTimestamp": "Fri Oct 29 06:21:45 2021",
- "timestampMillis": "1635488505235",
+ "dateTimestamp": "Fri Oct 29 06:06:54 2021",
+ "timestampMillis": "1635487614833",
  "buildSummary": {
   "hardwarePlatform": "xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm",
   "hardwareDsa": "xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xsa",
@@ -61,7 +61,7 @@
    "base": {
     "type": "BT_UKNOWN",
     "name": "kernel",
-    "file": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/build/kernel.xclbin",
+    "file": "/home/ec2-user/FPGA_go_brrrr/practice/vmult_xrt_memory/build/kernel.xclbin",
     "reports": [],
     "uuid": ""
    },
@@ -73,7 +73,7 @@
    "base": {
     "type": "BT_UKNOWN",
     "name": "kernel.link",
-    "file": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/build/kernel.link.xclbin",
+    "file": "/home/ec2-user/FPGA_go_brrrr/practice/vmult_xrt_memory/build/kernel.link.xclbin",
     "reports": [],
     "uuid": ""
    },
@@ -85,10 +85,10 @@
 <ENTRY>
 {
  "type": "ET_Report",
- "dateTimestamp": "Fri Oct 29 06:21:45 2021",
- "timestampMillis": "1635488505291",
+ "dateTimestamp": "Fri Oct 29 06:06:54 2021",
+ "timestampMillis": "1635487614886",
  "report": {
-  "path": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/_x/reports/package/v++_package_kernel_guidance.html",
+  "path": "/home/ec2-user/FPGA_go_brrrr/practice/vmult_xrt_memory/_x/reports/package/v++_package_kernel_guidance.html",
   "name": "",
   "fileType": "HTML",
   "reportType": "GLOBAL_RULECHECK_GUIDANCE",
@@ -99,10 +99,10 @@
 <ENTRY>
 {
  "type": "ET_Report",
- "dateTimestamp": "Fri Oct 29 06:21:45 2021",
- "timestampMillis": "1635488505291",
+ "dateTimestamp": "Fri Oct 29 06:06:54 2021",
+ "timestampMillis": "1635487614887",
  "report": {
-  "path": "/home/ec2-user/FPGA_go_brrrr/practice/wide_vadd/_x/v++_package_kernel_guidance.pb",
+  "path": "/home/ec2-user/FPGA_go_brrrr/practice/vmult_xrt_memory/_x/v++_package_kernel_guidance.pb",
   "name": "",
   "fileType": "BINARY_PROTOBUF",
   "reportType": "GLOBAL_RULECHECK_GUIDANCE",
@@ -113,10 +113,10 @@
 <ENTRY>
 {
  "type": "ET_Status",
- "dateTimestamp": "Fri Oct 29 06:21:45 2021",
- "timestampMillis": "1635488505292",
+ "dateTimestamp": "Fri Oct 29 06:06:54 2021",
+ "timestampMillis": "1635487614887",
  "status": {
-  "cmdId": "5b0aae1b-082e-4e3a-96bc-8d9145dbff00",
+  "cmdId": "0a816cb8-31f7-487d-befd-e7e6743cdb9a",
   "state": "CS_PASSED"
  }
 }

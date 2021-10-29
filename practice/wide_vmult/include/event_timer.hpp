@@ -57,6 +57,7 @@ public:
     void clear(void);
 
     void print(int id = -1);
+    std::vector<float> times;
 };
 
 #endif // EVENT_TIMER_HPP__

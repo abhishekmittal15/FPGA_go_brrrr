@@ -1,6 +1,6 @@
 TARGET := sw_emu
 NUM_ELEMENTS := 4096
-KERNEL_NAME := krnl_vadd
+KERNEL_NAME := krnl
 device := $(AWS_PLATFORM)
 host_files := ./host/host.cpp ./host/xcl2.cpp ./host/event_timer.cpp
 kernel_file := ./kernel/kernel.cpp

@@ -11,7 +11,7 @@ xclbin Information
    Kernels:                krnl
    Signature:              
    Content:                SW Emulation Binary
-   UUID (xclbin):          8afc8ad2-54ed-6754-709e-f29484611a25
+   UUID (xclbin):          00efa28c-8b3d-b561-32f7-83e8d25556b2
    UUID (IINTF):           7dc1d0e35634b9ee815669cf7799bacdd2c64af1bdf0d8327bc4f1348464a014
    UUID (IINTF):           1e9e9ad0ef8701220ec7e69e97f948cd
    Sections:               BITSTREAM, MEM_TOPOLOGY, IP_LAYOUT, CONNECTIVITY, 
@@ -100,7 +100,7 @@ Ports
    Port:          M_AXI_GMEM
    Mode:          master
    Range (bytes): 0xFFFFFFFF
-   Data Width:    512 bits
+   Data Width:    32 bits
    Port Type:     addressable
 
    Port:          S_AXI_CONTROL

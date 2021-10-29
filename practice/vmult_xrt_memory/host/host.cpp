@@ -110,7 +110,7 @@ std::vector<float> f(char *filename, unsigned int num_elements)
 
     if(verified==false){
         cout<<"Not working"<<endl;
-        return EXIT_FAILURE;
+        exit(1);
     }
 
     return et.times;

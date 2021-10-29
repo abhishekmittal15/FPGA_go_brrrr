@@ -9,10 +9,10 @@
 <ENTRY>
 {
  "type": "ET_CmdStep",
- "dateTimestamp": "Thu Oct 28 19:15:43 2021",
- "timestampMillis": "1635448543324",
+ "dateTimestamp": "Fri Oct 29 09:10:29 2021",
+ "timestampMillis": "1635498629131",
  "buildStep": {
-  "cmdId": "476d5c0a-c5d7-4b70-affd-53520a4f2faf",
+  "cmdId": "f1e5c38c-5270-4bc5-8496-709867530cb2",
   "name": "v++",
   "logFile": "/home/ec2-user/FPGA_go_brrrr/practice/sub_buffer/_x/package/package.steps.log",
   "commandLine": "/tools/Xilinx/Vitis/2021.1/bin/unwrapped/lnx64.o/v++  --vivado.prop \"run.__KERNEL__.{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}={-directive sdx_optimization_effort_high}\" --advanced.misc \"report=type report_timing_summary name impl_report_timing_summary_route_design_summary steps {route_design} runs {impl_1} options {-max_paths 10}\" --advanced.misc \"report=type report_timing_summary name impl_report_timing_summary_post_route_phys_opt_design_summary steps {post_route_phys_opt_design} runs {impl_1} options {-max_paths 10}\" -p ./build/kernel.link.xclbin -t sw_emu --platform /home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2/xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm --package.out_dir ./package.sw_emu -o ./build/kernel.xclbin ",
@@ -36,10 +36,10 @@
 <ENTRY>
 {
  "type": "ET_Status",
- "dateTimestamp": "Thu Oct 28 19:15:43 2021",
- "timestampMillis": "1635448543324",
+ "dateTimestamp": "Fri Oct 29 09:10:29 2021",
+ "timestampMillis": "1635498629131",
  "status": {
-  "cmdId": "476d5c0a-c5d7-4b70-affd-53520a4f2faf",
+  "cmdId": "f1e5c38c-5270-4bc5-8496-709867530cb2",
   "state": "CS_RUNNING"
  }
 }
@@ -47,8 +47,8 @@
 <ENTRY>
 {
  "type": "ET_FlowMetaData",
- "dateTimestamp": "Thu Oct 28 19:15:49 2021",
- "timestampMillis": "1635448549915",
+ "dateTimestamp": "Fri Oct 29 09:10:35 2021",
+ "timestampMillis": "1635498635689",
  "buildSummary": {
   "hardwarePlatform": "xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm",
   "hardwareDsa": "xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xsa",
@@ -85,8 +85,8 @@
 <ENTRY>
 {
  "type": "ET_Report",
- "dateTimestamp": "Thu Oct 28 19:15:49 2021",
- "timestampMillis": "1635448549967",
+ "dateTimestamp": "Fri Oct 29 09:10:35 2021",
+ "timestampMillis": "1635498635743",
  "report": {
   "path": "/home/ec2-user/FPGA_go_brrrr/practice/sub_buffer/_x/reports/package/v++_package_kernel_guidance.html",
   "name": "",
@@ -99,8 +99,8 @@
 <ENTRY>
 {
  "type": "ET_Report",
- "dateTimestamp": "Thu Oct 28 19:15:49 2021",
- "timestampMillis": "1635448549968",
+ "dateTimestamp": "Fri Oct 29 09:10:35 2021",
+ "timestampMillis": "1635498635743",
  "report": {
   "path": "/home/ec2-user/FPGA_go_brrrr/practice/sub_buffer/_x/v++_package_kernel_guidance.pb",
   "name": "",
@@ -113,10 +113,10 @@
 <ENTRY>
 {
  "type": "ET_Status",
- "dateTimestamp": "Thu Oct 28 19:15:49 2021",
- "timestampMillis": "1635448549968",
+ "dateTimestamp": "Fri Oct 29 09:10:35 2021",
+ "timestampMillis": "1635498635744",
  "status": {
-  "cmdId": "476d5c0a-c5d7-4b70-affd-53520a4f2faf",
+  "cmdId": "f1e5c38c-5270-4bc5-8496-709867530cb2",
   "state": "CS_PASSED"
  }
 }

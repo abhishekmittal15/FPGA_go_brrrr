@@ -9,7 +9,7 @@ extern "C"{
     ){
         for (unsigned int i = 0; i < num_elements;i+=buffer_size){
 
-            const unsigned int chunk_size = buffer_size;
+            unsigned int chunk_size = buffer_size;
             if((num_elements-i)<chunk_size)
                 chunk_size = num_elements - i;
 

@@ -1,6 +1,6 @@
 TARGET := sw_emu
-NUM_ELEMENTS := 4096
-KERNEL_NAME := krnl_vadd
+NUM_ELEMENTS := 500000
+KERNEL_NAME := krnl
 device := $(AWS_PLATFORM)
 host_files := ./host/host.cpp ./host/xcl2.cpp ./host/event_timer.cpp
 kernel_file := ./kernel/kernel.cpp
@@ -73,7 +73,7 @@ ifneq ($(TARGET),hw)
 	@echo 
 	@echo 
 	@echo RUNTIME RESULTS
-	XCL_EMULATION_MODE=$(TARGET) ./host_exe $(NUM_ELEMENTS) $(build_folder)/kernel.xclbin 
+	XCL_EMULATION_MODE=$(TARGET) ./host_exe $(build_folder)/kernel.xclbin 
 else
 	./host 
 endif
@@ -123,5 +123,6 @@ clean:
 	-$(RMDIR) src/*.ll *v++* .Xil emconfig.json dltmp* xmltmp* *.log *.jou *.wcfg *.wdb
 	-$(RMDIR) build_dir* sd_card*
 	-$(RMDIR) package.*
+	-$(RMDIR) ./.run
 	-$(RMDIR) _x* *xclbin.run_summary qemu-memory-_* emulation _vimage pl* start_simulation.sh *.xclbin
 
