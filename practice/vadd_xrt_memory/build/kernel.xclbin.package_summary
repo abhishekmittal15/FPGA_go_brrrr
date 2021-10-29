@@ -1,0 +1,123 @@
+<ENTRY>
+{
+ "thisFile": "/home/ec2-user/FPGA_go_brrrr/practice/vadd_xrt_memory/build/kernel.xclbin.package_summary",
+ "connectId": "",
+ "serverToken": "",
+ "timestamp": "0"
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_CmdStep",
+ "dateTimestamp": "Thu Oct 28 23:47:06 2021",
+ "timestampMillis": "1635464826998",
+ "buildStep": {
+  "cmdId": "0f2894d5-9009-493a-8fe8-0cef1a870dca",
+  "name": "v++",
+  "logFile": "/home/ec2-user/FPGA_go_brrrr/practice/vadd_xrt_memory/_x/package/package.steps.log",
+  "commandLine": "/tools/Xilinx/Vitis/2021.1/bin/unwrapped/lnx64.o/v++  --vivado.prop \"run.__KERNEL__.{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}={-directive sdx_optimization_effort_high}\" --advanced.misc \"report=type report_timing_summary name impl_report_timing_summary_route_design_summary steps {route_design} runs {impl_1} options {-max_paths 10}\" --advanced.misc \"report=type report_timing_summary name impl_report_timing_summary_post_route_phys_opt_design_summary steps {post_route_phys_opt_design} runs {impl_1} options {-max_paths 10}\" -p ./build/kernel.link.xclbin -t hw_emu --platform /home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2/xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm --package.out_dir ./package.hw_emu -o ./build/kernel.xclbin ",
+  "args": [
+   "-p",
+   "./build/kernel.link.xclbin",
+   "-t",
+   "hw_emu",
+   "--platform",
+   "/home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2/xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm",
+   "--package.out_dir",
+   "./package.hw_emu",
+   "-o",
+   "./build/kernel.xclbin"
+  ],
+  "iniFiles": [],
+  "cwd": "/home/ec2-user/FPGA_go_brrrr/practice/vadd_xrt_memory"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Thu Oct 28 23:47:06 2021",
+ "timestampMillis": "1635464826999",
+ "status": {
+  "cmdId": "0f2894d5-9009-493a-8fe8-0cef1a870dca",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_FlowMetaData",
+ "dateTimestamp": "Thu Oct 28 23:47:14 2021",
+ "timestampMillis": "1635464834554",
+ "buildSummary": {
+  "hardwarePlatform": "xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xpfm",
+  "hardwareDsa": "xilinx_aws-vu9p-f1_shell-v04261818_201920_2.xsa",
+  "platformDirectory": "/home/ec2-user/aws-fpga/Vitis/aws_platform/xilinx_aws-vu9p-f1_shell-v04261818_201920_2",
+  "runtime": "OpenCL",
+  "systemConfig": "Linux",
+  "flow": "BF_PACKAGE",
+  "target": "TT_HW_EMU",
+  "binaryContainer": {
+   "base": {
+    "type": "BT_UKNOWN",
+    "name": "kernel",
+    "file": "/home/ec2-user/FPGA_go_brrrr/practice/vadd_xrt_memory/build/kernel.xclbin",
+    "reports": [],
+    "uuid": ""
+   },
+   "kernels": []
+  },
+  "kernels": [],
+  "toolVersion": "Vitis V++ Compiler Release 2021.1. SW Build 3246112 on 2021-06-09-14:19:56",
+  "inputBinaryContainer": {
+   "base": {
+    "type": "BT_UKNOWN",
+    "name": "kernel.link",
+    "file": "/home/ec2-user/FPGA_go_brrrr/practice/vadd_xrt_memory/build/kernel.link.xclbin",
+    "reports": [],
+    "uuid": "9bb27788-7087-49c5-8e5a-5d31153f2ef2"
+   },
+   "kernels": []
+  }
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Thu Oct 28 23:47:14 2021",
+ "timestampMillis": "1635464834881",
+ "report": {
+  "path": "/home/ec2-user/FPGA_go_brrrr/practice/vadd_xrt_memory/_x/reports/package/v++_package_kernel_guidance.html",
+  "name": "",
+  "fileType": "HTML",
+  "reportType": "GLOBAL_RULECHECK_GUIDANCE",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Thu Oct 28 23:47:14 2021",
+ "timestampMillis": "1635464834882",
+ "report": {
+  "path": "/home/ec2-user/FPGA_go_brrrr/practice/vadd_xrt_memory/_x/v++_package_kernel_guidance.pb",
+  "name": "",
+  "fileType": "BINARY_PROTOBUF",
+  "reportType": "GLOBAL_RULECHECK_GUIDANCE",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Thu Oct 28 23:47:14 2021",
+ "timestampMillis": "1635464834883",
+ "status": {
+  "cmdId": "0f2894d5-9009-493a-8fe8-0cef1a870dca",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>

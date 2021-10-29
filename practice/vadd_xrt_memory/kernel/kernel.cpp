@@ -1,7 +1,7 @@
 #define buffer_size 256
 
 extern "C"{
-    void kernel(
+    void krnl(
         int *a,
         int *b,
         int *out,
