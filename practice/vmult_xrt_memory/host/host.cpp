@@ -6,22 +6,31 @@
 using std::cout;
 using std::endl;
 
-void init(int *a, int *b, int *sw, int *hw, unsigned int num_elements)
+void init(float *a, float *b, float *sw, float *hw, unsigned int num_elements)
 {
 
     for (unsigned int i = 0; i < num_elements; i++)
     {
-        a[i] = (std::rand() % 2) * std::rand();
-        b[i] = (std::rand() % 2) * std::rand();
-        sw[i] = 0;
-        hw[i] = 0;
+        a[i] = (float)(std::rand())/(float)(RAND_MAX);
+        b[i] = (float)(std::rand())/(float)(RAND_MAX);
+        sw[i] = 0.0;
+        hw[i] = 0.0;
     }
 }
 
-void host(int *a, int *b, int *sw, unsigned int num_elements)
+void host(float *a, float *b, float *sw, unsigned int num_elements)
 {
     for (unsigned int i = 0; i < num_elements; i++)
-        sw[i] = a[i] + b[i];
+        sw[i] = a[i] * b[i];
+}
+
+bool verify(float *a,float* b,float* sw,float* hw,unsigned int num_elements){
+    for (unsigned int i = 0; i < num_elements;i++)
+        if(sw[i]!=hw[i]){
+            cout << i << " " << a[i] << " * " << b[i] << " = " << sw[i] << " | " << hw[i] << endl;
+            return false;
+        }
+    return true;
 }
 
 std::vector<float> f(char *filename, unsigned int num_elements)
@@ -29,7 +38,7 @@ std::vector<float> f(char *filename, unsigned int num_elements)
 
     EventTimer et;
     auto binaryFile = xcl::read_binary_file(filename);
-    unsigned int size_bytes = num_elements * sizeof(int);
+    unsigned int size_bytes = num_elements * sizeof(float);
     cl::Program::Binaries bins{{binaryFile.data(), binaryFile.size()}};
     cl::Device device;
     cl::Context context;
@@ -63,10 +72,10 @@ std::vector<float> f(char *filename, unsigned int num_elements)
     et.finish();
 
     et.add("Map");
-    int *a = (int *)(q.enqueueMapBuffer(a_buf, CL_TRUE, CL_MAP_WRITE, 0, size_bytes));
-    int *b = (int *)(q.enqueueMapBuffer(b_buf, CL_TRUE, CL_MAP_WRITE, 0, size_bytes));
-    int *sw = (int *)(q.enqueueMapBuffer(sw_buf, CL_TRUE, CL_MAP_READ | CL_MAP_WRITE, 0, size_bytes));
-    int *hw = (int *)(q.enqueueMapBuffer(hw_buf, CL_TRUE, CL_MAP_READ, 0, size_bytes));
+    float *a = (float *)(q.enqueueMapBuffer(a_buf, CL_TRUE, CL_MAP_WRITE, 0, size_bytes));
+    float *b = (float *)(q.enqueueMapBuffer(b_buf, CL_TRUE, CL_MAP_WRITE, 0, size_bytes));
+    float *sw = (float *)(q.enqueueMapBuffer(sw_buf, CL_TRUE, CL_MAP_READ | CL_MAP_WRITE, 0, size_bytes));
+    float *hw = (float *)(q.enqueueMapBuffer(hw_buf, CL_TRUE, CL_MAP_READ, 0, size_bytes));
     et.finish();
 
     et.add("Populate");
@@ -97,6 +106,13 @@ std::vector<float> f(char *filename, unsigned int num_elements)
     et.print();
     cout << "----------------------------------------------" << endl;
 
+    bool verified = verify(a, b, sw, hw, num_elements);
+
+    if(verified==false){
+        cout<<"Not working"<<endl;
+        return EXIT_FAILURE;
+    }
+
     return et.times;
 }
 
@@ -105,8 +121,8 @@ int main(int argc, char **argv)
 
     char *filename = argv[1];
     std::vector<std::vector<float>> times;
-    unsigned int n = (int)(1e3);
-    for (unsigned int i = 0; i < 1; i++)
+    unsigned int n = (int)(1e5);
+    for (unsigned int i = 0; i < 10; i++)
     {
         std::vector<float> time_n = f(filename, n);
         times.push_back(time_n);

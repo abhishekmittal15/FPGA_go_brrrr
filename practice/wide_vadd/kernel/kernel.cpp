@@ -134,7 +134,7 @@
 using vint16 = hls::vector<int, 16>;
 
 extern "C"{
-void wide_krnl(vint16 *a, vint16 *b, vint16 *c, int size)
+void krnl(vint16 *a, vint16 *b, vint16 *c, int size)
 {
 // #pragma HLS INTERFACE m_axi bundle = in_a port = a depth = 1024
 // #pragma HLS INTERFACE m_axi bundle = in_b port = b depth = 1024

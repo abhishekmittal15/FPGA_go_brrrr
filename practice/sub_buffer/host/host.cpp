@@ -33,13 +33,23 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <memory>
 #include <string>
-#include<omp.h>
+#include <omp.h>
+#include <vector>
 
 // Xilinx OpenCL and XRT includes
 #include "xilinx_ocl_helper.hpp"
 
-#define BUFSIZE (1024 * 1024 * 32)
+// #define BUFSIZE (1024 * 1024 * 32)
 #define NUM_BUFS 1
+
+void init(uint32_t *a, uint32_t *b, uint32_t *c, uint32_t *d,unsigned int num_elements){
+    for (unsigned int i = 0; i < num_elements; i++){
+        a[i] = std::rand();
+        b[i] = std::rand();
+        c[i] = 0;
+        d[i] = 0;
+    }
+}
 
 void vadd_sw(uint32_t *a, uint32_t *b, uint32_t *c, uint32_t size)
 {
@@ -151,15 +161,13 @@ int enqueue_subbuf_vadd(cl::CommandQueue &q,
     return 0;
 }
 
-int main(int argc, char *argv[])
-{
-    // Initialize an event timer we'll use for monitoring the application
+std::vector<float> f(char* filename,int num_elements){
     EventTimer et;
 
     // const unsigned int NUM_BUFS = std::stoi(argv[1]);
-    std::string file(argv[1]);
+    std::string file(filename);
 
-    std::cout << "-- Example 5: Pipelining Kernel Execution --" << std::endl
+    std::cout << "-- Example 5: Pipelining Kernel Execution for "<<num_elements<<" elements --" << std::endl
               << std::endl;
 
     // Initialize the runtime (including a command queue) and load the
@@ -173,7 +181,7 @@ int main(int argc, char *argv[])
     xocl.initialize(file);
 
     cl::CommandQueue q = xocl.get_command_queue();
-    cl::Kernel krnl = xocl.get_kernel("vadd");
+    cl::Kernel krnl = xocl.get_kernel("krnl");
     et.finish();
 
     /// New code for example 01
@@ -189,20 +197,20 @@ int main(int argc, char *argv[])
         et.add("Allocate contiguous OpenCL buffers");
         cl::Buffer a_buf(xocl.get_context(),
                          static_cast<cl_mem_flags>(CL_MEM_READ_ONLY),
-                         BUFSIZE * sizeof(uint32_t),
+                         num_elements * sizeof(uint32_t),
                          NULL,
                          NULL);
         cl::Buffer b_buf(xocl.get_context(),
                          static_cast<cl_mem_flags>(CL_MEM_READ_ONLY),
-                         BUFSIZE * sizeof(uint32_t),
+                         num_elements * sizeof(uint32_t),
                          NULL,
                          NULL);
         cl::Buffer c_buf(xocl.get_context(),
                          static_cast<cl_mem_flags>(CL_MEM_READ_WRITE),
-                         BUFSIZE * sizeof(uint32_t),
+                         num_elements * sizeof(uint32_t),
                          NULL,
                          NULL);
-        uint32_t *d = new uint32_t[BUFSIZE];
+        uint32_t *d = new uint32_t[num_elements];
         et.finish();
 
         // Although we'll change these later, we'll set the buffers as kernel
@@ -217,30 +225,26 @@ int main(int argc, char *argv[])
                                                      CL_TRUE,
                                                      CL_MAP_WRITE,
                                                      0,
-                                                     BUFSIZE * sizeof(uint32_t));
+                                                     num_elements * sizeof(uint32_t));
         uint32_t *b = (uint32_t *)q.enqueueMapBuffer(b_buf,
                                                      CL_TRUE,
                                                      CL_MAP_WRITE,
                                                      0,
-                                                     BUFSIZE * sizeof(uint32_t));
+                                                     num_elements * sizeof(uint32_t));
         uint32_t *c = (uint32_t *)q.enqueueMapBuffer(c_buf,
                                                      CL_TRUE,
                                                      CL_MAP_READ,
                                                      0,
-                                                     BUFSIZE * sizeof(uint32_t));
+                                                     num_elements * sizeof(uint32_t));
         et.finish();
 
         et.add("Populating buffer inputs");
-        for (int i = 0; i < BUFSIZE; i++)
-        {
-            a[i] = i;
-            b[i] = 2 * i;
-        }
+        init(a,b,c,d,num_elements)
         et.finish();
 
         // For comparison, let's have the CPU calculate the result
         et.add("Software VADD run");
-        vadd_sw(a, b, d, BUFSIZE);
+        vadd_sw(a, b, d, num_elements);
         et.finish();
 
         // Send the buffers down to the Alveo card
@@ -249,11 +253,14 @@ int main(int argc, char *argv[])
         q.enqueueUnmapMemObject(b_buf, b);
 
         std::vector<cl::Buffer> a_bufs, b_bufs, c_bufs;
+        et.add("Subdividing the buffers");
         subdivide_buffer(a_bufs, a_buf, CL_MEM_READ_ONLY, NUM_BUFS);
-        subdivide_buffer(b_bufs, b_buf, CL_MEM_READ_ONLY, NUM_BUFS);
+                                                                                                                                                               subdivide_buffer(b_bufs, b_buf, CL_MEM_READ_ONLY, NUM_BUFS);
         subdivide_buffer(c_bufs, c_buf, CL_MEM_WRITE_ONLY, NUM_BUFS);
+        et.finish();
 
-        std::array<cl::Event, NUM_BUFS> kernel_events;
+        // std::array<cl::Event, NUM_BUFS> kernel_events;
+        std::vector<cl::Event> kernel_events(NUM_BUFS);
 
         for (int i = 0; i < NUM_BUFS; i++)
         {
@@ -267,14 +274,14 @@ int main(int argc, char *argv[])
 
         // Verify the results
         bool verified = true;
-        for (int i = 0; i < BUFSIZE; i++)
+        for (int i = 0; i < num_elements; i++)
         {
             if (c[i] != d[i])
             {
                 verified = false;
                 std::cout << "ERROR: software and hardware vadd do not match: "
                           << c[i] << "!=" << d[i] << " at position " << i << std::endl;
-                break;
+                return EXIT_FAILURE;
             }
         }
 
@@ -308,4 +315,33 @@ int main(int argc, char *argv[])
         std::cout << "ERROR: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
+    return et.times;
+}
+
+int main(int argc, char *argv[])
+{
+
+    char *filename = argv[1];
+    unsigned int n=(int)(1e5);
+    unsigned int increment = n;
+    std::vector<std::vector<float>> times;
+    int num_loops = 10;
+    for (int i = 0; i < num_loops;i++){
+        std::vector<float> timestamps=f(filename,n);
+        times.push_back(timestamps);
+        n += increment;
+    }
+    cout << "[" << endl;
+    for (int i = 0; i < 10; i++)
+    {
+        cout << "[";
+        for (int j = 0; j < times[i].size(); j++)
+        {
+            cout << times[i][j] << ",";
+        }
+        cout << "]," << endl;
+    }
+    cout << "]" << endl;
+
+    return EXIT_SUCCESS;
 }
