@@ -12,7 +12,7 @@ Copy-Item $root\common\xrt.ini
 # Creating the host folder 
 mkdir host 
 Set-Location host 
-New-Item host.cpp 
+Copy-Item $root\cosine_similarity\host.cpp .
 Copy-Item $root\common\*.cpp .
 Set-Location ..
 

@@ -5,7 +5,7 @@
 using std::cout;
 using std::endl;
 
-#define N 1
+int N = 1;
 #define M 256
 #define size_database N*M*4
 #define size_input_vector M*4
@@ -15,6 +15,7 @@ const std::string kernel_name = "normal";
 std::vector<uint32_t, aligned_allocator<uint32_t>> database(N*M);
 std::vector<uint32_t, aligned_allocator<uint32_t>> source(M);
 std::vector<uint32_t, aligned_allocator<uint32_t>> result(N*M);
+std::vector<uint32_t, aligned_allocator<uint32_t>> sw(N*M);
 
 void generate_database(){
     for (unsigned int i = 0; i < N;i++){
@@ -44,7 +45,7 @@ void generate_results(){
     for (unsigned int i = 0; i < N;i++){
         for (unsigned int j = 0; j < M;j++){
             unsigned int index = i * M + j;
-            result[index] = database[index] * source[j];
+            sw[index] = database[index] * source[j];
         }
     }
 }
@@ -69,11 +70,12 @@ int main(int argc,char **argv){
 
     cl::Buffer a(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, size_database, database.data(), );
     cl::buffer b(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, size_input_vector, source.data(), );
-    cl::buffer c(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, size_result, result.data(), );
+    cl::buffer c(context, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY, size_result, result.data(), );
 
-    kernel.setArg(0, database);
-    kernel.setArg(0, source);
-    kernel.setArg(0, result);
+    kernel.setArg(0, a);
+    kernel.setArg(1, b);
+    kernel.setArg(2, c);
+    kernel.setArg(3, N);
 
     q.enqueueMigrateMemObjects({database, source});
 
