@@ -10,8 +10,8 @@
 // Xilinx OpenCL and XRT includes
 #include "xilinx_ocl_helper.hpp"
 
-#define n (1024 * 1024 * 32)
-#define NUM_BUFS 110
+// #define n (1024 * 1024 * 32)
+#define NUM_BUFS 10
 
 // void init(int *a, int *b, int *c, int *d,unsigned int num_elements){
 //     for (unsigned int i = 0; i < num_elements; i++){
@@ -308,6 +308,7 @@ int main(int argc, char *argv[])
 {
 
     char *filename = argv[1];
+    unsigned int n=std::stoi(argv[2]);
     // unsigned int n=std::stoi(argv[1]);
     // unsigned int increment = n;
     // std::vector<std::vector<float>> times;

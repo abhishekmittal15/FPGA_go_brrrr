@@ -1,4 +1,4 @@
-TARGET := sw_emu
+TARGET := hw_emu
 NUM_ELEMENTS := 4096
 NUM_BUFS := 10
 KERNEL_NAME := krnl
@@ -75,7 +75,7 @@ ifneq ($(TARGET),hw)
 	@echo 
 	@echo 
 	@echo RUNTIME RESULTS
-	XCL_EMULATION_MODE=$(TARGET) ./host_exe $(build_folder)/kernel.xclbin 
+	XCL_EMULATION_MODE=$(TARGET) ./host_exe $(build_folder)/kernel.xclbin $(NUM_ELEMENTS)
 else
 	./host 
 endif

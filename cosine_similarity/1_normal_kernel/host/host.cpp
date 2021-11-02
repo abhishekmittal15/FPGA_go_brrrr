@@ -12,7 +12,7 @@ int main(int argc,char **argv){
         return EXIT_FAILURE;
     }
 
-    std::string kernel_name = "vmult";
+    char* kernel_name = "vmult";
     unsigned int num_elements = std::stoi(argv[1]);
     unsigned int size_bytes_input = num_elements * sizeof(uint32_t);
     unsigned int size_bytes_output = num_elements * sizeof(uint64_t);
@@ -21,17 +21,17 @@ int main(int argc,char **argv){
     cl::Program::Binaries bins{{binaryFile.data(),binaryFile.size()}};
 
     std::vector<cl::Device> devices=xcl::get_xil_devices();
-    cl::Device = devices[0];
+    cl::Device device= devices[0];
     cl_int err;
     cl::Context context(device, NULL, NULL, NULL, &err);
     cl::CommandQueue q(context, device, CL_QUEUE_PROFILING_ENABLE, &err);
-    cl::Program program(context, {device}, bins, &err);
+    cl::Program program(context, {device}, bins,NULL, &err);
     cl::Kernel kernel(program, kernel_name, &err);
 
-    std::vector<uint32_t, aligned_allocator<uint32>> a(num_elements);
-    std::vector<uint32_t, aligned_allocator<uint32>> b(num_elements);
-    std::vector<uint64_t, aligned_allocator<uint64>> sw(num_elements);
-    std::vector<uint64_t, aligned_allocator<uint64>> hw(num_elements);
+    std::vector<uint32_t, aligned_allocator<uint32_t>> a(num_elements);
+    std::vector<uint32_t, aligned_allocator<uint32_t>> b(num_elements);
+    std::vector<uint64_t, aligned_allocator<uint64_t>> sw(num_elements);
+    std::vector<uint64_t, aligned_allocator<uint64_t>> hw(num_elements);
 
     for (unsigned int i = 0;i<num_elements;i++){
         a[i] = std::rand();
@@ -52,7 +52,7 @@ int main(int argc,char **argv){
     kernel.setArg(2, b_buf);
     kernel.setArg(3, num_elements);
 
-    q.enqueueMemMigrateObjects({a_buf, b_buf}, 0);
+    q.enqueueMigrateMemObjects({a_buf, b_buf}, 0);
 
     q.enqueueTask(kernel, nullptr, &event);
     q.finish();
@@ -63,15 +63,16 @@ int main(int argc,char **argv){
 
     auto duration = kernel_end - kernel_start;
     cout<<kernel_queue<<endl;
-    cout << kernel << submit << endl;
+    cout << kernel_submit << endl;
     cout << kernel_start << endl;
     cout << kernel_end << endl;
+    cout << duration << endl;
 
     q.enqueueMigrateMemObjects({hw_buf}, CL_MIGRATE_MEM_OBJECT_HOST);
     q.finish();
 
     for (unsigned int i = 0; i < num_elements;i++){
-        cout << a[i] << " + " << b[i] << " = " << sw[i] << " | " << hw[i] << endl;
+        cout <<i<<" : "<< a[i] << " * " << b[i] << " = " << sw[i] << " | " << hw[i] << endl;
         if(sw[i]!=hw[i]){
             cout << "TESTS FAILED" << endl;
             return 1;

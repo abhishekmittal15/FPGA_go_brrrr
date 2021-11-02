@@ -1,5 +1,7 @@
+#include<stdint.h>
+
 extern "C"{
-    void vumlt(
+    void vmult(
         uint64_t *out,
         const uint32_t *a,
         const uint32_t *b,
