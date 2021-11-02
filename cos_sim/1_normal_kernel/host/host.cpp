@@ -1,20 +1,22 @@
 #include<iostream>
 #include<vector>
+#include<math.h>
 #include "xcl2.hpp"
 
 using std::cout;
 using std::endl;
 
-#define N 1
+unsigned int N=1;
 #define M 256
 #define size_database N*M*4
 #define size_input_vector M*4
 #define size_result N*M*4
 #define factor_10 (int)(1e4)
-const std::string kernel_name = "normal";
+const std::string kernel_name = "krnl";
 std::vector<uint32_t, aligned_allocator<uint32_t>> database(N*M);
 std::vector<uint32_t, aligned_allocator<uint32_t>> source(M);
 std::vector<uint32_t, aligned_allocator<uint32_t>> result(N*M);
+std::vector<uint32_t, aligned_allocator<uint32_t>> sw(N *M);
 
 void generate_database(){
     for (unsigned int i = 0; i < N;i++){
@@ -30,6 +32,7 @@ void generate_database(){
 }
 
 void generate_source(){
+    float sum = 0.0;
     for (unsigned int j = 0; j < M - 1; j++)
     {
         float random_number = (float)(std::rand()) / (float(RAND_MAX));
@@ -44,14 +47,15 @@ void generate_results(){
     for (unsigned int i = 0; i < N;i++){
         for (unsigned int j = 0; j < M;j++){
             unsigned int index = i * M + j;
-            result[index] = database[index] * source[j];
+            sw[index] = database[index] * source[j];
         }
     }
 }
 
 int main(int argc,char **argv){
 
-    char *filename=argv[1];
+    char *filename=argv[2];
+    N = std::stoi(argv[1]);
     auto fileBuf = xcl::read_binary_file(filename);
     cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
 
@@ -59,7 +63,7 @@ int main(int argc,char **argv){
     cl::Device device=devices[0];
     cl_int err;
     cl::Context context(device, NULL, NULL, NULL, &err);
-    cl::CommandQueue q(context,CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_ENABLE,device,NULL,&err);
+    cl::CommandQueue q(context, device, CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &err);
     cl::Program program(context, {device}, bins, NULL, &err);
     cl::Kernel kernel(program,kernel_name.c_str(),&err);
 
@@ -67,19 +71,21 @@ int main(int argc,char **argv){
     generate_source();
     generate_results();
 
-    cl::Buffer a(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, size_database, database.data(), );
-    cl::buffer b(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, size_input_vector, source.data(), );
-    cl::buffer c(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, size_result, result.data(), );
+    cl::Buffer a(context, static_cast<cl_mem_flags>(CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY), size_database, database.data(),&err );
+    cl::Buffer b(context, static_cast<cl_mem_flags>(CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY), size_input_vector, source.data(),&err );
+    cl::Buffer c(context, static_cast<cl_mem_flags>(CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY), size_result, result.data(),&err );
 
-    kernel.setArg(0, database);
-    kernel.setArg(0, source);
-    kernel.setArg(0, result);
+    kernel.setArg(0, a);
+    kernel.setArg(1, b);
+    kernel.setArg(2, c);
+    kernel.setArg(3, N);
 
-    q.enqueueMigrateMemObjects({database, source});
-
-    q.enqueueTask(kernel, nullptr, &event_sp);
-
-    q.enqueueMigrateMemObjects({result});
+    q.enqueueMigrateMemObjects({a, b},0);
+    q.finish();
+    q.enqueueTask(kernel);
+    q.finish();
+    q.enqueueMigrateMemObjects({c},CL_MIGRATE_MEM_OBJECT_HOST);
+    q.finish();
 
     for (unsigned int i = 0; i < N;i++){
         for (unsigned int j = 0;j<M;j++){
