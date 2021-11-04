@@ -58,7 +58,7 @@ public:
     void clear(void);
 
     void print(int id = -1);
-    void write();
+    // void write();
 };
 
 #endif // EVENT_TIMER_HPP__

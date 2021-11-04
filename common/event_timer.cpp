@@ -104,13 +104,13 @@ void EventTimer::print(int id)
     std::cout.flags(flags);
 }
 
-void EventTimer::write(std::string filename){
+// void EventTimer::write(std::string filename){
 
-    // std::ofstream file;
-    // file.open(filename, std::ios_base::out);
-    // for (unsigned int i = 0; i < event_names.size();i++){
-    //     file << event_names[i] << ",";
-    // }
+//     // std::ofstream file;
+//     // file.open(filename, std::ios_base::out);
+//     // for (unsigned int i = 0; i < event_names.size();i++){
+//     //     file << event_names[i] << ",";
+//     // }
      
-    // file.close();
-}
+//     // file.close();
+// }

@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include<math.h>
+#include "event_timer.hpp"
 #include "xcl2.hpp"
 
 using std::cout;
@@ -53,8 +54,8 @@ void generate_results(){
 }
 
 int main(int argc,char **argv){
-
-    char *filename=argv[2];
+    EventTimer et;
+    char *filename = argv[2];
     N = std::stoi(argv[1]);
     auto fileBuf = xcl::read_binary_file(filename);
     cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
@@ -83,15 +84,18 @@ int main(int argc,char **argv){
     q.enqueueMigrateMemObjects({a, b},0);
     q.finish();
     q.enqueueTask(kernel);
+    et.add("Kernel Execution");
     q.finish();
-    q.enqueueMigrateMemObjects({c},CL_MIGRATE_MEM_OBJECT_HOST);
+    et.finish();
+    et.print();
+    q.enqueueMigrateMemObjects({c}, CL_MIGRATE_MEM_OBJECT_HOST);
     q.finish();
 
     for (unsigned int i = 0; i < N;i++){
         for (unsigned int j = 0;j<M;j++){
             unsigned int index = i * M + j;
             if(result[index]!=sw[index]){
-                cout << i << " : " << j << " " << database[index] << " * " << source[index] << " = " << database[index] << " | " << result[index] << endl;
+                cout << i << " : " << j << " " << database[index] << " * " << source[j] << " = " << sw[index] << " | " << result[index] << endl;
                 cout<<"TESTS FAILED"<<endl;
                 return EXIT_FAILURE;
             }

@@ -1,0 +1,10 @@
+*temp_dir*
+*.csv
+*_x*
+*build*
+*.run*
+*log*
+*json*
+*summary*
+*xo*
+*exe*
