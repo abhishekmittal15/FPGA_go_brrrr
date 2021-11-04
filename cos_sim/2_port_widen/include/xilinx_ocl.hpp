@@ -72,31 +72,32 @@ struct aligned_allocator
     }
 };
 
-namespace swm {
-class XilinxOcl
+namespace swm
 {
-private:
-    bool is_initialized = false;
-    cl::Device device;
-    cl::Context context;
-    cl::Program program;
+    class XilinxOcl
+    {
+    private:
+        bool is_initialized = false;
+        cl::Device device;
+        cl::Context context;
+        cl::Program program;
 
-    std::vector<cl::Device> find_xilinx_devices();
+        std::vector<cl::Device> find_xilinx_devices();
 
-public:
-    XilinxOcl();
-    ~XilinxOcl();
+    public:
+        XilinxOcl();
+        ~XilinxOcl();
 
-    void initialize(std::string xclbin_file_name);
+        void initialize(std::string xclbin_file_name);
 
-    cl::CommandQueue get_command_queue(bool in_order         = false,
-                                       bool enable_profiling = false);
-    cl::Kernel get_kernel(std::string kernel_name);
-    cl::Buffer create_buffer(size_t size, cl_mem_flags flags);
-    cl::Buffer create_buffer_in_bank(int bank, size_t size, cl_mem_flags flags);
-    int get_fd_for_buffer(cl::Buffer buf);
-    cl::Buffer get_buffer_from_fd(int fd);
-    const cl::Context &get_context();
-};
+        cl::CommandQueue get_command_queue(bool in_order = false,
+                                           bool enable_profiling = false);
+        cl::Kernel get_kernel(std::string kernel_name);
+        cl::Buffer create_buffer(size_t size, cl_mem_flags flags);
+        cl::Buffer create_buffer_in_bank(int bank, size_t size, cl_mem_flags flags);
+        int get_fd_for_buffer(cl::Buffer buf);
+        cl::Buffer get_buffer_from_fd(int fd);
+        const cl::Context &get_context();
+    };
 } // namespace swm
 #endif

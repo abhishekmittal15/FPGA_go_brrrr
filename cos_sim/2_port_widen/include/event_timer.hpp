@@ -27,11 +27,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **********/
 
+
 #ifndef EVENT_TIMER_HPP__
 #define EVENT_TIMER_HPP__
 
 #include <chrono>
 #include <string>
+#include <fstream>
 #include <vector>
 
 class EventTimer
@@ -56,6 +58,7 @@ public:
     void clear(void);
 
     void print(int id = -1);
+    void write();
 };
 
 #endif // EVENT_TIMER_HPP__
