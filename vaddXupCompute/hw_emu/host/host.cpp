@@ -190,7 +190,7 @@ int main(int argc, char **argv) {
 
     char *filename = argv[1];
     unsigned int n = 1<<14;
-    unsigned int num_loops = 10;
+    unsigned int num_loops = 1;
     std::vector<std::vector<float>> times;
     for (unsigned int i = 0; i < num_loops;i++){
         std::vector<float> timestamps=f(n, filename);
