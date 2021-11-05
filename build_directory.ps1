@@ -3,6 +3,8 @@ $root = "D:\github Projects\FPGA_go_brrrr"
 mkdir $var
 $current_directory = Get-Location 
 Set-Location $current_directory/$var
+mkdir sw_emu
+Set-Location sw_emu
 
 # Create the Makefiles and the xrt.ini and config.ini files 
 Copy-Item $root\common\Makefile .
@@ -29,4 +31,7 @@ mkdir build
 mkdir include
 Set-Location include 
 Copy-Item $root/common/*.hpp . 
-Set-Location ..
+Set-Location ../..
+
+Copy-Item -r ./sw_emu ./hw_emu 
+Copy-Item -r ./sw_emu ./hw
