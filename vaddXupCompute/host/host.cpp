@@ -41,8 +41,9 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CL/cl_ext_xilinx.h"
 // This file is required for OpenCL C++ wrapper APIs
 #include "xcl2.hpp"
+using std::cout;
+using std::endl;
 #include "event_timer.hpp"
-
 
 void vectors_init(int *buffer_a, int *buffer_b, int *sw_results, int *hw_results, unsigned int num_elements) {
     // Fill the input vectors with random data
@@ -73,7 +74,9 @@ bool verify(int *a,int *b,int *sw_results, int *hw_results, int num_elements) {
     return match;
 }
 
-int f(unsigned int num_elements,char *binaryFile){
+std::vector<float> f(unsigned int num_elements,char *binaryFile){
+
+    EventTimer et;
 
     unsigned int size_bytes = num_elements * sizeof(int);
     cl::Device device;
@@ -176,8 +179,8 @@ int f(unsigned int num_elements,char *binaryFile){
     // OpenCL Host Code Ends
 
     // Compare the device results with software results
-    bool match = verify(sw_results.data(), hw_results.data(), num_elements);
-    std::cout << "--------------- Key execution times ---------------" << std::endl;
+    bool match = verify(buffer_a.data(),buffer_b.data(),sw_results.data(), hw_results.data(), num_elements);
+    std::cout << "--------------- Key execution times for "<<num_elements<<" ---------------" << std::endl;
     et.print();
 
     return et.times;
@@ -186,7 +189,7 @@ int f(unsigned int num_elements,char *binaryFile){
 int main(int argc, char **argv) {
 
     char *filename = argv[1];
-    unsigned int n = 1<<10;
+    unsigned int n = 1<<14;
     unsigned int num_loops = 10;
     std::vector<std::vector<float>> times;
     for (unsigned int i = 0; i < num_loops;i++){
@@ -200,7 +203,7 @@ int main(int argc, char **argv) {
     cout << "[" << endl;
     for (unsigned int i = 0; i < num_loops;i++){
         cout << "[";
-        for (unsigned int j = 0; j < times[i].size();i++){
+        for (unsigned int j = 0; j < times[i].size();j++){
             cout << times[i][j] << ",";
         }
         cout << "]";

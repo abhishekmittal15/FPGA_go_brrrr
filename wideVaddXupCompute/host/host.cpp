@@ -32,15 +32,16 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <memory>
 #include <string>
+using std::cout;
+using std::endl;
 
 // Xilinx OpenCL and XRT includes
 #include "xcl2.hpp"
 
-void vectors_init(uint32_t *a, uint32_t *b,uint32_t *c,uint32_t *d,unsigned int num_elements){
+void vectors_init(uint32_t *a, uint32_t *b,uint32_t *d,unsigned int num_elements){
     for (unsigned int i = 0;i<num_elements;i++){
         a[i] = std::rand();
         b[i] = std::rand();
-        c[i] = 0;
         d[i] = 0;
     }
 }
@@ -53,16 +54,14 @@ void vadd_sw(uint32_t *a, uint32_t *b, uint32_t *c, uint32_t size)
     }
 }
 
-std::vector<float> f(int num_elements,char *filename){
+std::vector<float> f(int num_elements,char *binaryFile){
     EventTimer et;
-
-    char *binaryName = argv[1];
 
     cl::Device device;
     cl::Context context;
     cl::CommandQueue q;
     cl::Program program;
-    cl::Kernel krnl_vadd;
+    cl::Kernel krnl;
     cl_int err;
 
     et.add("OpenCl Initialisation");
@@ -90,7 +89,7 @@ std::vector<float> f(int num_elements,char *filename){
         else
         {
             std::cout << "Device[" << i << "]: program successful!\n";
-            OCL_CHECK(err, krnl_vadd = cl::Kernel(program, "krnl_vadd", &err));
+            OCL_CHECK(err, krnl = cl::Kernel(program, "wide_vadd", &err));
             valid_device = true;
             break;
         }
@@ -107,22 +106,22 @@ std::vector<float> f(int num_elements,char *filename){
     bank_ext.flags = 2 | XCL_MEM_TOPOLOGY;
     bank_ext.obj = NULL;
     bank_ext.param = 0;
-    cl::Buffer a_buf(xocl.get_context(),
+    cl::Buffer a_buf(context,
                      static_cast<cl_mem_flags>(CL_MEM_READ_ONLY),
                      num_elements * sizeof(uint32_t),
                      NULL,
                      NULL);
-    cl::Buffer b_buf(xocl.get_context(),
+    cl::Buffer b_buf(context,
                      static_cast<cl_mem_flags>(CL_MEM_READ_ONLY),
                      num_elements * sizeof(uint32_t),
                      NULL,
                      NULL);
-    cl::Buffer c_buf(xocl.get_context(),
+    cl::Buffer c_buf(context,
                      static_cast<cl_mem_flags>(CL_MEM_READ_WRITE),
                      num_elements * sizeof(uint32_t),
                      NULL,
                      NULL);
-    cl::Buffer d_buf(xocl.get_context(),
+    cl::Buffer d_buf(context,
                      static_cast<cl_mem_flags>(CL_MEM_READ_WRITE |
                                                CL_MEM_ALLOC_HOST_PTR |
                                                CL_MEM_EXT_PTR_XILINX),
@@ -160,7 +159,7 @@ std::vector<float> f(int num_elements,char *filename){
     et.finish();
 
     et.add("Populating buffer inputs");
-    vectors_init(a, b, c, d, num_elements);
+    vectors_init(a, b, d, num_elements);
     et.finish();
 
     // For comparison, let's have the CPU calculate the result
@@ -191,13 +190,13 @@ std::vector<float> f(int num_elements,char *filename){
 
     // Verify the results
     bool verified = true;
-for (uint32_t i = 0; i < num_elements  ; i++)
+    for (uint32_t i = 0; i < num_elements  ; i++)
     {
         if (c[i] != d[i])
         {
             verified = false;
             std::cout << "ERROR: software and hardware vadd do not match: "
-                      << c[i] << "!=" << d[i] << " at position " << i << std::endl;
+                    << c[i] << "!=" << d[i] << " at position " << i << std::endl;
             break;
         }
     }
@@ -219,7 +218,7 @@ for (uint32_t i = 0; i < num_elements  ; i++)
             << std::endl;
     }
 
-    std::cout << "--------------- Key execution times ---------------" << std::endl;
+    std::cout << "--------------- Key execution times for "<<num_elements<<" ---------------" << std::endl;
 
     q.enqueueUnmapMemObject(a_buf, a);
     q.enqueueUnmapMemObject(b_buf, b);
@@ -229,7 +228,7 @@ for (uint32_t i = 0; i < num_elements  ; i++)
 
     et.print();
 
-    return et.times();
+    return et.times;
 }
 
 int main(int argc, char *argv[])
@@ -251,7 +250,7 @@ int main(int argc, char *argv[])
     for (unsigned int i = 0; i < num_loops; i++)
     {
         cout << "[";
-        for (unsigned int j = 0; j < times[i].size(); i++)
+        for (unsigned int j = 0; j < times[i].size(); j++)
         {
             cout << times[i][j] << ",";
         }
