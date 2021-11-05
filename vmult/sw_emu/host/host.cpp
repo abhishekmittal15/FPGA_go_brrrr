@@ -64,7 +64,7 @@ void host_side(float *a, float *b, float *sw, unsigned int num_elements)
     }
 }
 
-bool verify(int *a, int *b, int *sw_results, int *hw_results, int num_elements)
+bool verify(float *a, float *b, float *sw_results, float *hw_results,unsigned int num_elements)
 {
     bool match = true;
     for (int i = 0; i < num_elements; i++)
@@ -92,7 +92,7 @@ std::vector<float> f(unsigned int num_elements, char *binaryFile)
     cl::Program program;
     cl::Kernel krnl_vadd;
     cl_int err;
-    std::string kernel_name = "krnl1";
+    char* kernel_name = "krnl1";
 
     et.add("OpenCl Initialisation");
     auto devices = xcl::get_xil_devices();
@@ -119,7 +119,7 @@ std::vector<float> f(unsigned int num_elements, char *binaryFile)
         else
         {
             std::cout << "Device[" << i << "]: program successful!\n";
-            OCL_CHECK(err, krnl_vadd = cl::Kernel(program, kernel_name, &err));
+            OCL_CHECK(err, krnl_vadd = cl::Kernel(program, kernel_name.c_str(), &err));
             valid_device = true;
             break;
         }
