@@ -99,6 +99,7 @@ void EventTimer::print(int id)
             std::cout << std::right << std::setw(8) << std::fixed << std::setprecision(3)
                       << ms_difference(start_times[i], end_times[i]) << " ms"
                       << std::endl;
+            times.push_back(ms_difference(start_times[i], end_times[i]));
         }
     }
     std::cout.flags(flags);

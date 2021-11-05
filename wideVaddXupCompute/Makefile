@@ -73,7 +73,7 @@ ifneq ($(TARGET),hw)
 	@echo 
 	@echo 
 	@echo RUNTIME RESULTS
-	XCL_EMULATION_MODE=$(TARGET) ./host_exe $(build_folder)/kernel.xclbin 
+	XCL_EMULATION_MODE=$(TARGET) ./host_exe $(NUM_ELEMENTS) $(build_folder)/kernel.xclbin 
 else
 	./host 
 endif

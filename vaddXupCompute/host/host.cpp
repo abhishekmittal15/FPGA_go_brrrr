@@ -49,8 +49,14 @@ void vectors_init(int *buffer_a, int *buffer_b, int *sw_results, int *hw_results
     for (size_t i = 0; i < num_elements; i++) {
         buffer_a[i]    = std::rand() * ((std::rand() % 2) ? 1 : -1);
         buffer_b[i]    = std::rand() * ((std::rand() % 2) ? 1 : -1);
+        sw_results[i]=0;
         hw_results[i] = 0;
-        sw_results[i] = buffer_a[i] + buffer_b[i];
+    }
+}
+
+void host_side(int *a,int *b,int *sw,unsigned int num_elements){
+    for (unsigned int i = 0;i<num_elements;i++){
+        sw[i] = a[i] + b[i];
     }
 }
 
@@ -68,14 +74,8 @@ bool verify(int *a,int *b,int *sw_results, int *hw_results, int num_elements) {
 }
 
 int f(unsigned int num_elements,char *binaryFile){
-    // I/O Data Vectors
-    std::vector<int, aligned_allocator<int>> buffer_a(num_elements);
-    std::vector<int, aligned_allocator<int>> buffer_b(num_elements);
-    std::vector<int, aligned_allocator<int>> hw_results(num_elements);
-    std::vector<int, aligned_allocator<int>> sw_results(num_elements);
 
-    // OpenCL Host Code Begins.
-    // OpenCL objects
+    unsigned int size_bytes = num_elements * sizeof(int);
     cl::Device device;
     cl::Context context;
     cl::CommandQueue q;
@@ -83,19 +83,15 @@ int f(unsigned int num_elements,char *binaryFile){
     cl::Kernel krnl_vadd;
     cl_int err;
 
-    // get_xil_devices() is a utility API which will find the Xilinx
-    // platforms and will return list of devices connected to Xilinx platform
+    et.add("OpenCl Initialisation");
     auto devices = xcl::get_xil_devices();
 
-    // read_binary_file() is a utility API which will load the binaryFile
-    // and will return the pointer to file buffer.
     auto fileBuf = xcl::read_binary_file(binaryFile);
     cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
     bool valid_device = false;
     for (unsigned int i = 0; i < devices.size(); i++)
     {
         device = devices[i];
-        // Creating Context and Command Queue for selected Device
         OCL_CHECK(err, context = cl::Context(device, NULL, NULL, NULL, &err));
         OCL_CHECK(err,
                   q = cl::CommandQueue(context, device,
@@ -112,29 +108,30 @@ int f(unsigned int num_elements,char *binaryFile){
         else
         {
             std::cout << "Device[" << i << "]: program successful!\n";
-            // Creating Kernel
             OCL_CHECK(err, krnl_vadd = cl::Kernel(program, "krnl_vadd", &err));
             valid_device = true;
-            break; // we break because we found a valid device
+            break; 
         }
     }
+    et.finish();
     if (!valid_device)
     {
         std::cout << "Failed to program any device found, exit!\n";
         exit(EXIT_FAILURE);
     }
 
-    std::cout << "Running Vector add with " << num_elements << " elements" << std::endl;
+    et.add("Allocating memory");
+    std::vector<int, aligned_allocator<int>> buffer_a(num_elements);
+    std::vector<int, aligned_allocator<int>> buffer_b(num_elements);
+    std::vector<int, aligned_allocator<int>> hw_results(num_elements);
+    std::vector<int, aligned_allocator<int>> sw_results(num_elements);
+    et.finish();
 
-    // Initialize the data vectors
+    et.add("Populating the host memory");
     vectors_init(buffer_a.data(), buffer_b.data(), sw_results.data(), hw_results.data(), num_elements);
+    et.finish();
 
-    // Running the kernel
-    unsigned int size_bytes = num_elements * sizeof(int);
-
-    // Allocate Buffer in Global Memory
-    // Buffers are allocated using CL_MEM_USE_HOST_PTR for efficient memory and
-    // Device-to-host communication
+    et.add("Buffer creation");
     OCL_CHECK(err, cl::Buffer buffer_input1(context,
                                             CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,
                                             size_bytes, buffer_a.data(), &err));
@@ -146,34 +143,44 @@ int f(unsigned int num_elements,char *binaryFile){
     OCL_CHECK(err, cl::Buffer buffer_output(context,
                                             CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY,
                                             size_bytes, hw_results.data(), &err));
+    et.finish();
 
-    // Setting Kernel Arguments krnl_vadd
+    et.add("Setting the kernel args");
     OCL_CHECK(err, err = krnl_vadd.setArg(0, buffer_input1));
     OCL_CHECK(err, err = krnl_vadd.setArg(1, buffer_input2));
     OCL_CHECK(err, err = krnl_vadd.setArg(2, buffer_output));
     OCL_CHECK(err, err = krnl_vadd.setArg(3, num_elements));
+    et.finish();
 
-    // Copy input data to device global memory
+    et.add("Host side computation");
+    host_side(buffer_a.data(), buffer_b.data(), sw_results.data(), num_elements);
+    et.finish();
+
     OCL_CHECK(err, err = q.enqueueMigrateMemObjects({buffer_input1, buffer_input2}, 0 /* 0 means from host*/));
+    et.add("H2f time");
     OCL_CHECK(err, err = q.finish());
+    et.finish();
 
-    // Launching the Kernels
-    std::cout << "Launching Hardware Kernel..." << std::endl;
     OCL_CHECK(err, err = q.enqueueTask(krnl_vadd));
-    // wait for the kernel to finish their operations
+    et.add("Kernel execution time");
     OCL_CHECK(err, err = q.finish());
+    et.finish();
 
     // Copy Result from Device Global Memory to Host Local Memory
     std::cout << "Getting Hardware Results..." << std::endl;
     OCL_CHECK(err, err = q.enqueueMigrateMemObjects({buffer_output}, CL_MIGRATE_MEM_OBJECT_HOST));
+    et.add("F2h time");
     OCL_CHECK(err, err = q.finish());
+    et.finish();
 
     // OpenCL Host Code Ends
 
     // Compare the device results with software results
     bool match = verify(sw_results.data(), hw_results.data(), num_elements);
+    std::cout << "--------------- Key execution times ---------------" << std::endl;
+    et.print();
 
-    return 1;
+    return et.times;
 }
 
 int main(int argc, char **argv) {
