@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<Runs Version="1" Minor="0">
-	<Run Id="krnl_vmult" LaunchDir="/home/ec2-user/FPGA_go_brrrr/practice/aligned_malloc/temp_dir/kernel/krnl_vmult" FlowId="Build_IP" FromStepId="vitis_hls" ToStepId="vitis_hls"/>
-</Runs>
-

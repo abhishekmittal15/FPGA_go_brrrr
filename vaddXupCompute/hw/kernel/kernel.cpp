@@ -28,8 +28,9 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **********/
 
 #define BUFFER_SIZE 256
-// #define DATA_SIZE 4096
+// #define DATA_SIZE 4096 
 // TRIPCOUNT identifier
+// const unsigned int c_len = DATA_SIZE / BUFFER_SIZE;
 const unsigned int c_size = BUFFER_SIZE;
 
 /**
@@ -44,17 +45,15 @@ const unsigned int c_size = BUFFER_SIZE;
 
 extern "C"
 {
-    void krnl1(const float *in1,
-            const float *in2,
-            float *out_r,
-            unsigned int size)
+    void krnl_vadd(int *in1,
+                   int *in2,
+                   int *out_r,
+                   unsigned int size)
     {
 
-        const unsigned int c_len =size/ BUFFER_SIZE;
-        float v1_buffer[BUFFER_SIZE]; // Local memory to store vector1
-
+        int v1_buffer[BUFFER_SIZE]; // Local memory to store vector1
+        const unsigned int c_len=size/BUFFER_SIZE;
         // Per iteration of this loop perform BUFFER_SIZE vector addition
-        outer:
         for (unsigned int i = 0; i < size; i += BUFFER_SIZE)
         {
 #pragma HLS LOOP_TRIPCOUNT min = c_len max = c_len
@@ -77,7 +76,7 @@ extern "C"
             {
 #pragma HLS LOOP_TRIPCOUNT min = c_size max = c_size
                 // perform vector addition
-                out_r[i + j] = v1_buffer[j] * in2[i + j];
+                out_r[i + j] = v1_buffer[j] + in2[i + j];
             }
         }
     }

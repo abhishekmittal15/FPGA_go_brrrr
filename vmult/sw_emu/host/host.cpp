@@ -73,10 +73,11 @@ bool verify(float *a, float *b, float *sw_results, float *hw_results,unsigned in
         {
             cout << a[i] << " * " << b[i] << " = " << sw_results[i] << " | " << hw_results[i] << endl;
             match = false;
-            break;
+            cout << "TESTS FAILED" << endl;
+            exit(1);
         }
     }
-    std::cout << "TEST " << (match ? "PASSED" : "FAILED") << std::endl;
+    std::cout << "TESTS PASSED"  << std::endl;
     return match;
 }
 
@@ -92,7 +93,7 @@ std::vector<float> f(unsigned int num_elements, char *binaryFile)
     cl::Program program;
     cl::Kernel krnl_vadd;
     cl_int err;
-    char* kernel_name = "krnl1";
+    std::string kernel_name = "krnl1";
 
     et.add("OpenCl Initialisation");
     auto devices = xcl::get_xil_devices();

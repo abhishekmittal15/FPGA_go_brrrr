@@ -27,6 +27,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **********/
 
+
 #include <algorithm>
 #include <cstring>
 #include <iostream>
@@ -44,56 +45,46 @@ using std::cout;
 using std::endl;
 #include "event_timer.hpp"
 
-void vectors_init(float *buffer_a, float *buffer_b, float *sw_results, float *hw_results, unsigned int num_elements)
-{
+void vectors_init(int *buffer_a, int *buffer_b, int *sw_results, int *hw_results, unsigned int num_elements) {
     // Fill the input vectors with random data
-    for (size_t i = 0; i < num_elements; i++)
-    {
-        buffer_a[i] = (float)(std::rand()) / (float)(RAND_MAX);
-        buffer_b[i] = (float)(std::rand()) / (float)(RAND_MAX);
-        sw_results[i] = 0.0;
-        hw_results[i] = 0.0;
+    for (size_t i = 0; i < num_elements; i++) {
+        buffer_a[i]    = std::rand() * ((std::rand() % 2) ? 1 : -1);
+        buffer_b[i]    = std::rand() * ((std::rand() % 2) ? 1 : -1);
+        sw_results[i]=0;
+        hw_results[i] = 0;
     }
 }
 
-void host_side(float *a, float *b, float *sw, unsigned int num_elements)
-{
-    for (unsigned int i = 0; i < num_elements; i++)
-    {
-        sw[i] = a[i] * b[i];
+void host_side(int *a,int *b,int *sw,unsigned int num_elements){
+    for (unsigned int i = 0;i<num_elements;i++){
+        sw[i] = a[i] + b[i];
     }
 }
 
-bool verify(float *a, float *b, float *sw_results, float *hw_results, unsigned int num_elements)
-{
+bool verify(int *a,int *b,int *sw_results, int *hw_results, int num_elements) {
     bool match = true;
-    for (int i = 0; i < num_elements; i++)
-    {
-            cout << a[i] << " * " << b[i] << " = " << sw_results[i] << " | " << hw_results[i] << endl;
-        if (sw_results[i] != hw_results[i])
-        {
+    for (int i = 0; i < num_elements; i++) {
+        if (sw_results[i] != hw_results[i]) {
+            cout << a[i] << " + " << b[i] << " = " << sw_results[i] << " | " << hw_results[i] << endl;
             match = false;
-            cout << "TESTS FAILED" << endl;
-            exit(1);
+            break;
         }
     }
-    std::cout << "TESTS PASSED" << std::endl;
+    std::cout << "TEST " << (match ? "PASSED" : "FAILED") << std::endl;
     return match;
 }
 
-std::vector<float> f(unsigned int num_elements, char *binaryFile)
-{
+std::vector<float> f(unsigned int num_elements,char *binaryFile){
 
     EventTimer et;
 
-    unsigned int size_bytes = num_elements * sizeof(float);
+    unsigned int size_bytes = num_elements * sizeof(int);
     cl::Device device;
     cl::Context context;
     cl::CommandQueue q;
     cl::Program program;
     cl::Kernel krnl_vadd;
     cl_int err;
-    std::string kernel_name = "krnl1";
 
     et.add("OpenCl Initialisation");
     auto devices = xcl::get_xil_devices();
@@ -120,9 +111,9 @@ std::vector<float> f(unsigned int num_elements, char *binaryFile)
         else
         {
             std::cout << "Device[" << i << "]: program successful!\n";
-            OCL_CHECK(err, krnl_vadd = cl::Kernel(program, kernel_name.c_str(), &err));
+            OCL_CHECK(err, krnl_vadd = cl::Kernel(program, "krnl_vadd", &err));
             valid_device = true;
-            break;
+            break; 
         }
     }
     et.finish();
@@ -133,10 +124,10 @@ std::vector<float> f(unsigned int num_elements, char *binaryFile)
     }
 
     et.add("Allocating memory");
-    std::vector<float, aligned_allocator<float>> buffer_a(num_elements);
-    std::vector<float, aligned_allocator<float>> buffer_b(num_elements);
-    std::vector<float, aligned_allocator<float>> hw_results(num_elements);
-    std::vector<float, aligned_allocator<float>> sw_results(num_elements);
+    std::vector<int, aligned_allocator<int>> buffer_a(num_elements);
+    std::vector<int, aligned_allocator<int>> buffer_b(num_elements);
+    std::vector<int, aligned_allocator<int>> hw_results(num_elements);
+    std::vector<int, aligned_allocator<int>> sw_results(num_elements);
     et.finish();
 
     et.add("Populating the host memory");
@@ -188,23 +179,21 @@ std::vector<float> f(unsigned int num_elements, char *binaryFile)
     // OpenCL Host Code Ends
 
     // Compare the device results with software results
-    bool match = verify(buffer_a.data(), buffer_b.data(), sw_results.data(), hw_results.data(), num_elements);
-    std::cout << "--------------- Key execution times for " << num_elements << " ---------------" << std::endl;
+    bool match = verify(buffer_a.data(),buffer_b.data(),sw_results.data(), hw_results.data(), num_elements);
+    std::cout << "--------------- Key execution times for "<<num_elements<<" ---------------" << std::endl;
     et.print();
 
     return et.times;
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 
     char *filename = argv[1];
-    unsigned int n = 1 << 5;
+    unsigned int n = 1<<14;
     unsigned int num_loops = 1;
     std::vector<std::vector<float>> times;
-    for (unsigned int i = 0; i < num_loops; i++)
-    {
-        std::vector<float> timestamps = f(n, filename);
+    for (unsigned int i = 0; i < num_loops;i++){
+        std::vector<float> timestamps=f(n, filename);
         n *= 2;
         cout << "____________________________________________________________________" << endl;
         cout << "____________________________________________________________________" << endl;
@@ -212,11 +201,9 @@ int main(int argc, char **argv)
         times.push_back(timestamps);
     }
     cout << "[" << endl;
-    for (unsigned int i = 0; i < num_loops; i++)
-    {
+    for (unsigned int i = 0; i < num_loops;i++){
         cout << "[";
-        for (unsigned int j = 0; j < times[i].size(); j++)
-        {
+        for (unsigned int j = 0; j < times[i].size();j++){
             cout << times[i][j] << ",";
         }
         cout << "]";
