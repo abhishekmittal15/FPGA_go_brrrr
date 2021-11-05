@@ -1,104 +1,226 @@
-#include<iostream>
-#include<vector>
-#include<math.h>
-#include "xcl2.hpp"
+/**********
+Copyright (c) 2020, Xilinx, Inc.
+All rights reserved.
 
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors
+may be used to endorse or promote products derived from this software
+without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**********/
+
+#include <algorithm>
+#include <cstring>
+#include <iostream>
+#include <string>
+#include <thread>
+#include <unistd.h>
+#include <vector>
+#include <iomanip>
+
+// This extension file is required for stream APIs
+#include "CL/cl_ext_xilinx.h"
+// This file is required for OpenCL C++ wrapper APIs
+#include "xcl2.hpp"
 using std::cout;
 using std::endl;
+#include "event_timer.hpp"
 
-unsigned int N=1;
-#define M 256
-#define size_database N*M*4
-#define size_input_vector M*4
-#define size_result N*M*4
-#define factor_10 (int)(1e4)
-const std::string kernel_name = "krnl";
-std::vector<uint32_t, aligned_allocator<uint32_t>> database(N*M);
-std::vector<uint32_t, aligned_allocator<uint32_t>> source(M);
-std::vector<uint32_t, aligned_allocator<uint32_t>> result(N*M);
-std::vector<uint32_t, aligned_allocator<uint32_t>> sw(N *M);
-
-void generate_database(){
-    for (unsigned int i = 0; i < N;i++){
-        float sum = 0.0;
-        for (unsigned int j = 0; j < M-1;j++){
-            float random_number = (float)(std::rand()) / (float(RAND_MAX));
-            sum += (random_number * random_number);
-            database[i*M+j] = (random_number * factor_10);
-        }
-        float last_entry = sqrt(1 - sum);
-        database[i * M + M-1] = (last_entry * factor_10);
-    }
-}
-
-void generate_source(){
-    float sum = 0.0;
-    for (unsigned int j = 0; j < M - 1; j++)
+void vectors_init(float *buffer_a, float *buffer_b, float *sw_results, float *hw_results, unsigned int num_elements)
+{
+    // Fill the input vectors with random data
+    for (size_t i = 0; i < num_elements; i++)
     {
-        float random_number = (float)(std::rand()) / (float(RAND_MAX));
-        sum += (random_number * random_number);
-        source[j] = (random_number * factor_10);
+        buffer_a[i] = (float)(std::rand()) / (float)(RAND_MAX);
+        buffer_b[i] = (float)(std::rand()) / (float)(RAND_MAX);
+        sw_results[i] = 0.0;
+        hw_results[i] = 0.0;
     }
-    float last_entry = sqrt(1 - sum);
-    source[M - 1] = (last_entry * factor_10);
 }
 
-void generate_results(){
-    for (unsigned int i = 0; i < N;i++){
-        for (unsigned int j = 0; j < M;j++){
-            unsigned int index = i * M + j;
-            sw[index] = database[index] * source[j];
+void host_side(float *a, float *b, float *sw, unsigned int num_elements)
+{
+    for (unsigned int i = 0; i < num_elements; i++)
+    {
+        sw[i] = a[i] * b[i];
+    }
+}
+
+bool verify(float *a, float *b, float *sw_results, float *hw_results, unsigned int num_elements)
+{
+    bool match = true;
+    for (int i = 0; i < num_elements; i++)
+    {
+            cout << a[i] << " * " << b[i] << " = " << sw_results[i] << " | " << hw_results[i] << endl;
+        if (sw_results[i] != hw_results[i])
+        {
+            match = false;
+            cout << "TESTS FAILED" << endl;
+            exit(1);
         }
     }
+    std::cout << "TESTS PASSED" << std::endl;
+    return match;
 }
 
-int main(int argc,char **argv){
+std::vector<float> f(unsigned int num_elements, char *binaryFile)
+{
 
-    char *filename=argv[2];
-    N = std::stoi(argv[1]);
-    auto fileBuf = xcl::read_binary_file(filename);
-    cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
+    EventTimer et;
 
-    std::vector<cl::Device> devices = xcl::get_xil_devices();
-    cl::Device device=devices[0];
+    unsigned int size_bytes = num_elements * sizeof(float);
+    cl::Device device;
+    cl::Context context;
+    cl::CommandQueue q;
+    cl::Program program;
+    cl::Kernel krnl_vadd;
     cl_int err;
-    cl::Context context(device, NULL, NULL, NULL, &err);
-    cl::CommandQueue q(context, device, CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &err);
-    cl::Program program(context, {device}, bins, NULL, &err);
-    cl::Kernel kernel(program,kernel_name.c_str(),&err);
+    std::string kernel_name = "krnl1";
 
-    generate_database();
-    generate_source();
-    generate_results();
+    et.add("OpenCl Initialisation");
+    auto devices = xcl::get_xil_devices();
 
-    cl::Buffer a(context, static_cast<cl_mem_flags>(CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY), size_database, database.data(),&err );
-    cl::Buffer b(context, static_cast<cl_mem_flags>(CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY), size_input_vector, source.data(),&err );
-    cl::Buffer c(context, static_cast<cl_mem_flags>(CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY), size_result, result.data(),&err );
-
-    kernel.setArg(0, a);
-    kernel.setArg(1, b);
-    kernel.setArg(2, c);
-    kernel.setArg(3, N);
-
-    q.enqueueMigrateMemObjects({a, b},0);
-    q.finish();
-    q.enqueueTask(kernel);
-    q.finish();
-    q.enqueueMigrateMemObjects({c},CL_MIGRATE_MEM_OBJECT_HOST);
-    q.finish();
-
-    for (unsigned int i = 0; i < N;i++){
-        for (unsigned int j = 0;j<M;j++){
-            unsigned int index = i * M + j;
-            if(result[index]!=sw[index]){
-                cout << i << " : " << j << " " << database[index] << " * " << source[index] << " = " << database[index] << " | " << result[index] << endl;
-                cout<<"TESTS FAILED"<<endl;
-                return EXIT_FAILURE;
-            }
+    auto fileBuf = xcl::read_binary_file(binaryFile);
+    cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
+    bool valid_device = false;
+    for (unsigned int i = 0; i < devices.size(); i++)
+    {
+        device = devices[i];
+        OCL_CHECK(err, context = cl::Context(device, NULL, NULL, NULL, &err));
+        OCL_CHECK(err,
+                  q = cl::CommandQueue(context, device,
+                                       CL_QUEUE_PROFILING_ENABLE |
+                                           CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE,
+                                       &err));
+        std::cout << "Trying to program device[" << i
+                  << "]: " << device.getInfo<CL_DEVICE_NAME>() << std::endl;
+        cl::Program program(context, {device}, bins, NULL, &err);
+        if (err != CL_SUCCESS)
+        {
+            std::cout << "Failed to program device[" << i << "] with xclbin file!\n";
+        }
+        else
+        {
+            std::cout << "Device[" << i << "]: program successful!\n";
+            OCL_CHECK(err, krnl_vadd = cl::Kernel(program, kernel_name.c_str(), &err));
+            valid_device = true;
+            break;
         }
     }
-    cout << "------------------------------------------------" << endl;
-    cout <<"TESTS PASSED"<<endl;
-    cout << "------------------------------------------------" << endl;
-    return EXIT_SUCCESS; 
+    et.finish();
+    if (!valid_device)
+    {
+        std::cout << "Failed to program any device found, exit!\n";
+        exit(EXIT_FAILURE);
+    }
+
+    et.add("Allocating memory");
+    std::vector<float, aligned_allocator<float>> buffer_a(num_elements);
+    std::vector<float, aligned_allocator<float>> buffer_b(num_elements);
+    std::vector<float, aligned_allocator<float>> hw_results(num_elements);
+    std::vector<float, aligned_allocator<float>> sw_results(num_elements);
+    et.finish();
+
+    et.add("Populating the host memory");
+    vectors_init(buffer_a.data(), buffer_b.data(), sw_results.data(), hw_results.data(), num_elements);
+    et.finish();
+
+    et.add("Buffer creation");
+    OCL_CHECK(err, cl::Buffer buffer_input1(context,
+                                            CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,
+                                            size_bytes, buffer_a.data(), &err));
+
+    OCL_CHECK(err, cl::Buffer buffer_input2(context,
+                                            CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,
+                                            size_bytes, buffer_b.data(), &err));
+
+    OCL_CHECK(err, cl::Buffer buffer_output(context,
+                                            CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY,
+                                            size_bytes, hw_results.data(), &err));
+    et.finish();
+
+    et.add("Setting the kernel args");
+    OCL_CHECK(err, err = krnl_vadd.setArg(0, buffer_input1));
+    OCL_CHECK(err, err = krnl_vadd.setArg(1, buffer_input2));
+    OCL_CHECK(err, err = krnl_vadd.setArg(2, buffer_output));
+    OCL_CHECK(err, err = krnl_vadd.setArg(3, num_elements));
+    et.finish();
+
+    et.add("Host side computation");
+    host_side(buffer_a.data(), buffer_b.data(), sw_results.data(), num_elements);
+    et.finish();
+
+    OCL_CHECK(err, err = q.enqueueMigrateMemObjects({buffer_input1, buffer_input2}, 0 /* 0 means from host*/));
+    et.add("H2f time");
+    OCL_CHECK(err, err = q.finish());
+    et.finish();
+
+    OCL_CHECK(err, err = q.enqueueTask(krnl_vadd));
+    et.add("Kernel execution time");
+    OCL_CHECK(err, err = q.finish());
+    et.finish();
+
+    // Copy Result from Device Global Memory to Host Local Memory
+    std::cout << "Getting Hardware Results..." << std::endl;
+    OCL_CHECK(err, err = q.enqueueMigrateMemObjects({buffer_output}, CL_MIGRATE_MEM_OBJECT_HOST));
+    et.add("F2h time");
+    OCL_CHECK(err, err = q.finish());
+    et.finish();
+
+    // OpenCL Host Code Ends
+
+    // Compare the device results with software results
+    bool match = verify(buffer_a.data(), buffer_b.data(), sw_results.data(), hw_results.data(), num_elements);
+    std::cout << "--------------- Key execution times for " << num_elements << " ---------------" << std::endl;
+    et.print();
+
+    return et.times;
+}
+
+int main(int argc, char **argv)
+{
+
+    char *filename = argv[1];
+    unsigned int n = 1 << 5;
+    unsigned int num_loops = 1;
+    std::vector<std::vector<float>> times;
+    for (unsigned int i = 0; i < num_loops; i++)
+    {
+        std::vector<float> timestamps = f(n, filename);
+        n *= 2;
+        cout << "____________________________________________________________________" << endl;
+        cout << "____________________________________________________________________" << endl;
+        cout << "____________________________________________________________________" << endl;
+        times.push_back(timestamps);
+    }
+    cout << "[" << endl;
+    for (unsigned int i = 0; i < num_loops; i++)
+    {
+        cout << "[";
+        for (unsigned int j = 0; j < times[i].size(); j++)
+        {
+            cout << times[i][j] << ",";
+        }
+        cout << "]";
+    }
+    cout << "]" << endl;
+    return 0;
 }
