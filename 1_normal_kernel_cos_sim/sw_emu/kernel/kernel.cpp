@@ -4,7 +4,7 @@
 const unsigned int c_size = M;
 
 extern "C"{
-    void krnl1(
+    void krnl(
         const float *a,
         const float *b,
         float *result,
@@ -42,7 +42,7 @@ extern "C"{
             }
             if(sum>max_val){
                 max_val = sum;
-                record_no = [i / M];
+                record_no = i / M;
             }
         }
         result[0] = max_val;

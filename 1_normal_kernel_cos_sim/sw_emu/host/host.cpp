@@ -28,7 +28,7 @@ void generate_database(){
             database[i * M + j] = random_number;
         }
         float last_entry = sqrt(1 - sum);
-        database[i * M + M-1] = last_entry;
+        database[N*M-1] = last_entry;
     }
 }
 
@@ -48,6 +48,7 @@ void generate_results(){
     for (unsigned int i = 0; i < N;i++){
         for (unsigned int j = 0; j < M;j++){
             unsigned int index = i * M + j;
+            float sum = 0.0;
             sw[index] = database[index] * source[j];
         }
     }

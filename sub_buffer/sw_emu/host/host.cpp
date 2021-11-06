@@ -33,13 +33,17 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <memory>
 #include <string>
-#include "openmp.h"
+#include <omp.h>
 
 // Xilinx OpenCL and XRT includes
 #include "xilinx_ocl_helper.hpp"
-
-#define BUFSIZE (1024 * 1024 * 32)
-#define NUM_BUFS 10
+using std::cout;
+using std::endl;
+// #define BUFSIZE (1024 * 1024 * 32)
+#define NUM_BUFS 8
+xilinx::example_utils::XilinxOclHelper xocl;
+cl::CommandQueue q;
+cl::Kernel krnl;
 
 void vadd_sw(uint32_t *a, uint32_t *b, uint32_t *c, uint32_t size)
 {
@@ -151,29 +155,11 @@ int enqueue_subbuf_vadd(cl::CommandQueue &q,
     return 0;
 }
 
-int main(int argc, char *argv[])
-{
-    // Initialize an event timer we'll use for monitoring the application
+std::vector<float> f(unsigned int BUFSIZE){
     EventTimer et;
 
     std::cout << "-- Example 5: Pipelining Kernel Execution --" << std::endl
               << std::endl;
-
-    // Initialize the runtime (including a command queue) and load the
-    // FPGA image
-    std::cout << "Loading alveo_examples.xclbin to program the Alveo board" << std::endl
-              << std::endl;
-    et.add("OpenCL Initialization");
-
-    // This application will use the first Xilinx device found in the system
-    std::string binaryFile(argv[1]);
-    xilinx::example_utils::XilinxOclHelper xocl;
-    xocl.initialize(binaryFile);
-
-    std::string kernel_name = "krnl1";
-    cl::CommandQueue q = xocl.get_command_queue();
-    cl::Kernel krnl = xocl.get_kernel(kernel_name);
-    et.finish();
 
     /// New code for example 01
     std::cout << std::endl
@@ -217,16 +203,19 @@ int main(int argc, char *argv[])
                                                      CL_MAP_WRITE,
                                                      0,
                                                      BUFSIZE * sizeof(uint32_t));
+        cout << "a success" << endl;
         uint32_t *b = (uint32_t *)q.enqueueMapBuffer(b_buf,
                                                      CL_TRUE,
                                                      CL_MAP_WRITE,
                                                      0,
                                                      BUFSIZE * sizeof(uint32_t));
+        cout << "b success" << endl;
         uint32_t *c = (uint32_t *)q.enqueueMapBuffer(c_buf,
                                                      CL_TRUE,
                                                      CL_MAP_READ,
                                                      0,
                                                      BUFSIZE * sizeof(uint32_t));
+        cout << "c success" << endl;
         et.finish();
 
         et.add("Populating buffer inputs");
@@ -235,11 +224,13 @@ int main(int argc, char *argv[])
             a[i] = i;
             b[i] = 2 * i;
         }
+        cout << "Initialisation success" << endl;
         et.finish();
 
         // For comparison, let's have the CPU calculate the result
         et.add("Software VADD run");
         vadd_sw(a, b, d, BUFSIZE);
+        cout<<"Hello there host side success"<<endl;
         et.finish();
 
         // Send the buffers down to the Alveo card
@@ -249,18 +240,24 @@ int main(int argc, char *argv[])
 
         std::vector<cl::Buffer> a_bufs, b_bufs, c_bufs;
         subdivide_buffer(a_bufs, a_buf, CL_MEM_READ_ONLY, NUM_BUFS);
+        cout << "a subdivide success" << endl;
         subdivide_buffer(b_bufs, b_buf, CL_MEM_READ_ONLY, NUM_BUFS);
-        subdivide_buffer(c_bufs, c_buf, CL_MEM_WRITE_ONLY, NUM_BUFS);
+        cout << "b subdivide success" << endl;
+        subdivide_buffer(c_bufs, c_buf, 
+        CL_MEM_WRITE_ONLY, NUM_BUFS);
+        cout << "c subdivide success" << endl;
 
         std::array<cl::Event, NUM_BUFS> kernel_events;
-
+        cout << "Array created" << endl;
         for (int i = 0; i < NUM_BUFS; i++)
         {
             enqueue_subbuf_vadd(q, krnl, kernel_events[i], a_bufs[i], b_bufs[i], c_bufs[i]);
+            cout << "Enqueue " << i << " successfull" << endl;
         }
 
         et.add("Wait for kernels to complete");
         clWaitForEvents(NUM_BUFS, (const cl_event *)&kernel_events);
+        cout << "Kernels ki liye wait" << endl;
 
         et.finish();
 
@@ -294,17 +291,48 @@ int main(int argc, char *argv[])
                 << std::endl;
         }
 
-        std::cout << "--------------- Key execution times ---------------" << std::endl;
+        std::cout << "--------------- Key execution times for "<<BUFSIZE<<" ---------------" << std::endl;
 
         q.enqueueUnmapMemObject(c_buf, c);
         free(d);
         q.finish();
 
         et.print();
+        return et.times;
     }
     catch (cl::Error &e)
     {
         std::cout << "ERROR: " << e.what() << std::endl;
-        return EXIT_FAILURE;
+        exit(1);
     }
+}
+
+int main(int argc, char *argv[])
+{
+    char *filename = argv[1];
+    std::cout << "Loading alveo_examples.xclbin to program the Alveo board" << std::endl<< std::endl;
+    std::string binaryFile(filename);
+    xocl.initialize(binaryFile);
+
+    std::string kernel_name = "krnl";
+    q = xocl.get_command_queue();
+    krnl = xocl.get_kernel(kernel_name);
+    unsigned int n = 1 << 15;    
+    unsigned int num_loops=10;
+    std::vector<std::vector<float>> times;
+    for(unsigned int i=0;i<num_loops;i++){
+        std::vector<float> timestamps = f(n);
+        times.push_back(timestamps);
+        n *= 2;
+    }
+    cout << "[" << endl;
+    for(unsigned int i=0;i<num_loops;i++){
+        cout << "[";
+        for (unsigned int j = 0;j<times[i].size();j++){
+            cout << times[i][j] << ",";
+        }
+        cout << "]"<<endl;
+    }
+    cout << "]";
+    return 0;
 }
