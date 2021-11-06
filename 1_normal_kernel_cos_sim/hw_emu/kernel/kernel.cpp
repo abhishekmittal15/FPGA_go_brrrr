@@ -24,6 +24,7 @@ extern "C"{
         unsigned int record_no = 0;
         float cur_max = 0.0;
         float src_vec[M];
+        float temp[M];
         read_src:
         for (unsigned int i = 0; i < M;i++)
             src_vec[i] = b[i];
@@ -36,10 +37,17 @@ extern "C"{
                 #pragma HLS LOOP TRIPCOUNT min=c_size max=c_size
                 db_vec[j] = a[i + j];
             }
-            macc:
+            multiply:
             for (unsigned int j = 0; j < M;j++){
                 #pragma HLS LOOP TRIPCOUNT min=c_size max=c_size
-                sum += db_vec[j] * b[j];
+                #pragma HLS PIPELINE
+                temp[j]= db_vec[j] * src_vec[j];
+            }
+            add:
+            for(unsigned int j=0;j<M;j++){
+#pragma HLS LOOP TRIPCOUNT min = c_size max = c_size
+#pragma HLS PIPELINE
+                sum += temp[j];
             }
             if (sum > cur_max)
             {
