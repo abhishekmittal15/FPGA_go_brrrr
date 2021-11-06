@@ -9,13 +9,25 @@ const unsigned int c_size = BUFFER_SIZE;
 
 extern "C"{
     void krnl(
-        const float_16 *a,
-        const float_16 *b,
-        float *result,
-        unsigned int N
-    ){
+        const float *a,
+        const float *b,
+        unsigned int N,
+        float max_val,
+        unsigned int ans)
+    {
+
+#pragma HLS INTERFACE m_axi port = a max_read_burst_length = 32 offset = slave bundle = gmem0
+#pragma HLS INTERFACE m_axi port = b max_read_burst_length = 32 offset = slave bundle = gmem1
+#pragma HLS INTERFACE s_axilite port = a bundle = control
+#pragma HLS INTERFACE s_axilite port = b bundle = control
+#pragma HLS INTERFACE s_axilite port = max_val bundle = control
+#pragma HLS INTERFACE s_axilite port = ans bundle = control
+#pragma HLS INTERFACE s_axilite port = N bundle = control
+#pragma HLS INTERFACE s_axilite port = return bundle = control
+
         float_16 db_2_vecs[BUFFER_SIZE];
         float_16 src_vec[16];
+
         read_src:
         for (unsigned int i = 0; i < 16;i++){
             src_vec[i] = b[i];
@@ -32,7 +44,7 @@ extern "C"{
         }      
         dot_1:
         for (unsigned int j = 0; j < BUFFER_SIZE/2;j+=DATAWIDTH){
-            #pragma HLS PIPELINE 
+#pragma HLS PIPELINE 
             macc:
             for (unsigned int k = 0; k < DATAWIDTH;k++){
 #pragma HLS unroll faxtor=16
@@ -50,6 +62,17 @@ extern "C"{
                 sum2 += db_2_vecs[j + k] * src[j + k];
             }
         }
+            if(sum1>max_val){
+                cur_max = sum1;
+                record_no = i;
+            }
+            if (sum2 > max_val)
+            {
+                cur_max = sum2;
+                record_no = i+1;
+            }
         }
-    }
+        max_val = cur_max;
+        ans = record_no;
+        }
 }
