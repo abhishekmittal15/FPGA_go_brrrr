@@ -1,5 +1,5 @@
 TARGET := sw_emu
-NUM_ELEMENTS := 4096
+NUM_ELEMENTS := 1024
 KERNEL_NAME := krnl
 device := $(AWS_PLATFORM)
 host_files := ./host/*
