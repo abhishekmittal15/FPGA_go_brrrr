@@ -33,6 +33,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <memory>
 #include <string>
+#include "openmp.h"
 
 // Xilinx OpenCL and XRT includes
 #include "xilinx_ocl_helper.hpp"
@@ -42,6 +43,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void vadd_sw(uint32_t *a, uint32_t *b, uint32_t *c, uint32_t size)
 {
+#pragma omp parallel for 
     for (int i = 0; i < size; i++)
     {
         c[i] = a[i] + b[i];

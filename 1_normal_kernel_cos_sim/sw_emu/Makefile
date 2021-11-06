@@ -29,7 +29,6 @@ opencl_LDFLAGS=-L$(OPENCL_LIB) -lOpenCL -pthread
 cxx := g++
 cxx_flags := $(opencl_CXXFLAGS) -Wall -O3 -g -std=c++11 -fmessage-length=0
 cxx_flags += -I$(include_folder)
-cxx_flags += -fopenmp
 ld_flags := $(opencl_LDFLAGS) 
 ld_flags += -lrt -lstdc++ -lxilinxopencl -lpthread
 ####################################

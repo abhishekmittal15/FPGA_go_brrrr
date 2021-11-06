@@ -14,7 +14,7 @@ Copy-Item $root\common\xrt.ini
 # Creating the host folder 
 mkdir host 
 Set-Location host 
-Copy-Item $root\cos_sim\host.cpp .
+Copy-Item $root\host.cpp 
 Copy-Item $root\common\*.cpp .
 Set-Location ..
 
