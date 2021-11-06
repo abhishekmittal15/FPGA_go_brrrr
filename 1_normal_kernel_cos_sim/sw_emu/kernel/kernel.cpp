@@ -7,17 +7,19 @@ extern "C"{
     void krnl(
         const float *a,
         const float *b,
-        float *result,
-        unsigned int N
+        unsigned int N,
+        float max_val,
+        unsigned int ans
     ){
 
-#pragma HLS INTERFACE mode = m_axi port = a max_read_burst_length = 32 offset = slave bundle = gmem0
-#pragma HLS INTERFACE mode = m_axi port = b max_read_burst_length = 32 offset = slave bundle = gmem1
-#pragma HLS INTERFACE mode = s_axilite port= a
-#pragma HLS INTERFACE mode = s_axilite port = b
-#pragma HLS INTERFACE mode = s_axilite port = N
-#pragma HLS INTERFACE mode = s_axilite port = result
-#pragma HLS INTERFACE mode = s_axilite port = return
+#pragma HLS INTERFACE m_axi port = a max_read_burst_length = 32 offset = slave bundle = gmem0
+#pragma HLS INTERFACE m_axi port = b max_read_burst_length = 32 offset = slave bundle = gmem1
+#pragma HLS INTERFACE s_axilite port = a bundle = control
+#pragma HLS INTERFACE s_axilite port = b bundle = control
+#pragma HLS INTERFACE s_axilite port = max_val bundle = control
+#pragma HLS INTERFACE s_axilite port = ans bundle = control
+#pragma HLS INTERFACE s_axilite port = N bundle = control
+#pragma HLS INTERFACE s_axilite port = return bundle = control
 
         float db_vec[M];
         unsigned int record_no = 0;

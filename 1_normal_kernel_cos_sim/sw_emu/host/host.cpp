@@ -18,6 +18,10 @@ std::vector<float, aligned_allocator<float>> database(N*M);
 std::vector<float, aligned_allocator<float>> source(M);
 std::vector<float, aligned_allocator<float>> result(N*M);
 std::vector<float, aligned_allocator<float>> sw(N *M);
+float max_val;
+unsigned int ans;
+float sw_max_val;
+unsigned int sw_ans;
 
 void generate_database(){
     for (unsigned int i = 0; i < N;i++){
@@ -46,10 +50,14 @@ void generate_source(){
 
 void generate_results(){
     for (unsigned int i = 0; i < N;i++){
+        float sum = 0.0;
         for (unsigned int j = 0; j < M;j++){
             unsigned int index = i * M + j;
-            float sum = 0.0;
-            sw[index] = database[index] * source[j];
+            sum+= = database[index] * source[j];
+        }
+        if(sum>max_val){
+            sum = max_val;
+            sw_ans = i;
         }
     }
 }
@@ -82,15 +90,13 @@ int main(int argc,char **argv){
     et.add("Buffer Creation");
     cl::Buffer a(context, static_cast<cl_mem_flags>(CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY), size_database, database.data(),&err );
     cl::Buffer b(context, static_cast<cl_mem_flags>(CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY), size_input_vector, source.data(),&err );
-    cl::Buffer c(context, static_cast<cl_mem_flags>(CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY), size_result, result.data(),&err );
-    et.finish();
 
     et.add("Set the kernel arguments");
     kernel.setArg(0, a);
     kernel.setArg(1, b);
-    kernel.setArg(2, c);
-    kernel.setArg(3, N);
-
+    kernel.setArg(2, N);
+    kernel.setArg(3, max_val);
+    kernel.setArg(4, ans);
 
     q.enqueueMigrateMemObjects({a, b},0);
     et.add("Migrate the input buffers to the device");
@@ -107,19 +113,17 @@ int main(int argc,char **argv){
     q.finish();
     et.finish();
 
-    for (unsigned int i = 0; i < N;i++){
-        for (unsigned int j = 0;j<M;j++){
-            unsigned int index = i * M + j;
-            if(result[index]!=sw[index]){
-                cout << i << " : " << j << " " << database[index] << " * " << source[index] << " = " << database[index] << " | " << result[index] << endl;
-                cout<<"TESTS FAILED"<<endl;
-                return EXIT_FAILURE;
-            }
-        }
-    }
+    bool verify = (sw_ans == ans) & (max_val == sw_max_val);
+    if(verify){
     cout << "------------------------------------------------" << endl;
     cout <<"TESTS PASSED"<<endl;
     cout << "------------------------------------------------" << endl;
+    }
+    else{
+        cout << "------------------------------------------------" << endl;
+        cout << "TESTS FAILED" << endl;
+        cout << "------------------------------------------------" << endl;
+    }
     et.print();
     return EXIT_SUCCESS; 
 }
