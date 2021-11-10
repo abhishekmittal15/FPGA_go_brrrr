@@ -15,10 +15,11 @@ fpga1=[]
 fpga2=[]
 for i in range(10):
     host.append(data[i][-4])
-    fpga1.append(data[i][-1]+data[i][-2]+data[i][-3])
-    fpga2.append(data[i][-2])
+    fpga1.append(data[i][-1]+data[i][-2]/10+data[i][-3])
+    fpga2.append(data[i][-2]/10)
 
 plt.figure()
+plt.title("CPU vs FPGA")
 plt.plot(x,fpga1,label="FPGA computation+communication")
 plt.plot(x,host,label="CPU Time")
 plt.legend()
@@ -27,6 +28,7 @@ plt.ylabel("Time in ms")
 plt.grid()
 
 plt.figure()
+plt.title("CPU vs FPGA")
 plt.plot(x,fpga2,label="FPGA kernel")
 plt.plot(x,host,label="CPU Time")
 plt.legend()
