@@ -54,7 +54,7 @@ extern "C"
         outer_2:
             for (unsigned int j = 0; j < c_n_wide; j += BUFFER_SIZE)
             {
-                #pragma HLS LOOP TRIPCOUNT min=c_n_wide/buf max=c_n_wide/buf
+                #pragma HLS LOOP TRIPCOUNT min=1 max=c_max_n_wide
                 unsigned int chunk_sz = (c_n_wide - j < BUFFER_SIZE) ? c_n_wide - j : BUFFER_SIZE;
                 // printf("-----------------%d-----------------\n",j);
             read_db:
@@ -73,6 +73,7 @@ extern "C"
                     pipeline_sum_parallel:
                     for(unsigned int l=0;l<DATAWIDTH;l++){
                         #pragma HLS unroll
+                        #pragma HLS LOOP TRIPCOUNT min=1 max=16
                         // printf("-----------------%d-----------------\n", j+k);
                         sum[j + k][l] += db_vec[k][l] * src_vec[i];
                     }
@@ -82,10 +83,11 @@ extern "C"
     write_sum:
         for (unsigned int i = 0; i < c_n_wide; i+=BUFFER_SIZE)
         {
-#pragma HLS LOOP TRIPCOUNT min = c_n_wide/buf max = c_n_wide/buf
+#pragma HLS LOOP TRIPCOUNT min = 1 max = c_max_n_wide/buf
 #pragma HLS PIPELINE
             unsigned int chunk_sz = (c_n_wide - i < BUFFER_SIZE) ? c_n_wide - i : BUFFER_SIZE;
             for (unsigned int j = 0; j < chunk_sz; j++){
+#pragma HLS LOOP TRIPCOUNT min=1 max=buf
             //     for (unsigned int k = 0; k < DATAWIDTH; k++)
                     // printf("%d : %f\n", i * DATAWIDTH + j * DATAWIDTH + k, sum[i * DATAWIDTH + j * DATAWIDTH][k]);
             result[i+j] = sum[i+j];

@@ -2,6 +2,7 @@
 
 #define M 256
 #define BUFFER_SIZE 256
+const unsigned int max_n = 1024;
 const unsigned int c_len = BUFFER_SIZE;
 const unsigned int c_m = M;
 
@@ -40,7 +41,7 @@ extern "C"
             #pragma HLS LOOP TRIPCOUNT min=M max=M 
             for (unsigned int j = 0; j < N; j += BUFFER_SIZE)
             {
-                #pragma HLS LOOP TRIPCOUNT min=N/c_m max=N/c_m
+                #pragma HLS LOOP TRIPCOUNT min=1 max=max_n/c_len
                 unsigned int chunk_sz = (N - j < BUFFER_SIZE) ? N - j : BUFFER_SIZE;
             read_db:
                 for (unsigned int k = 0; k < chunk_sz; k++)

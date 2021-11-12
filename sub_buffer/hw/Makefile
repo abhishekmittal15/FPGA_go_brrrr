@@ -1,8 +1,8 @@
 TARGET := sw_emu
 NUM_ELEMENTS := 4096
-KERNEL_NAME := krnl_vadd
+KERNEL_NAME := krnl
 device := $(AWS_PLATFORM)
-host_files := ./host/host.cpp ./host/xcl2.cpp
+host_files := ./host/*
 kernel_file := ./kernel/kernel.cpp
 include_folder := ./include
 TEMP_DIR := temp_dir
@@ -29,6 +29,7 @@ opencl_LDFLAGS=-L$(OPENCL_LIB) -lOpenCL -pthread
 cxx := g++
 cxx_flags := $(opencl_CXXFLAGS) -Wall -O3 -g -std=c++11 -fmessage-length=0
 cxx_flags += -I$(include_folder)
+cxx_flags += -fopenmp
 ld_flags := $(opencl_LDFLAGS) 
 ld_flags += -lrt -lstdc++ -lxilinxopencl -lpthread
 ####################################
@@ -73,9 +74,7 @@ ifneq ($(TARGET),hw)
 	@echo 
 	@echo 
 	@echo RUNTIME RESULTS
-	XCL_EMULATION_MODE=$(TARGET) ./host_exe $(NUM_ELEMENTS) $(build_folder)/kernel.xclbin 
-else
-	./host 
+	XCL_EMULATION_MODE=$(TARGET) ./host_exe $(build_folder)/kernel.xclbin 
 endif
 ##########################################
 

@@ -10,7 +10,7 @@ using std::endl;
 
 unsigned int N=1;
 #define M 256
-#define ncu 4
+#define ncu 2
 
 const std::string kernel_name = "krnl";
 float sw_max_val,hw_max_val;

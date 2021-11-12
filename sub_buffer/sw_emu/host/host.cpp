@@ -30,6 +30,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "event_timer.hpp"
 
 #include <array>
+#include<vector>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -248,6 +249,7 @@ std::vector<float> f(unsigned int BUFSIZE){
         cout << "c subdivide success" << endl;
 
         std::array<cl::Event, NUM_BUFS> kernel_events;
+        // std::vector<cl::Event> kernel_events(NUM_BUFS);
         cout << "Array created" << endl;
         for (int i = 0; i < NUM_BUFS; i++)
         {
@@ -318,7 +320,7 @@ int main(int argc, char *argv[])
     q = xocl.get_command_queue();
     krnl = xocl.get_kernel(kernel_name);
     unsigned int n = 1 << 15;    
-    unsigned int num_loops=10;
+    unsigned int num_loops=3;
     std::vector<std::vector<float>> times;
     for(unsigned int i=0;i<num_loops;i++){
         std::vector<float> timestamps = f(n);
